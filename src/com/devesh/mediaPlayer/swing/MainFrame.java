@@ -219,7 +219,6 @@ public class MainFrame extends javax.swing.JFrame
         sngList.setBorder(null);
         sngList.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         sngList.setModel(playlist.getListModel());
-        sngList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         sngList.setCellRenderer(new SngListCellRenderer(playlist));
         sngList.setDoubleBuffered(true);
         sngList.setDragEnabled(true);
@@ -483,6 +482,7 @@ public class MainFrame extends javax.swing.JFrame
 					sldVolume.setValue(sldVolume.getValue() + 5);
 				else
 					sngList.setSelectedIndex(sngList.getSelectedIndex()-1);
+				sngList.ensureIndexIsVisible(sngList.getSelectedIndex());
 			}
 			case KeyEvent.VK_DOWN -> {
 				if(evt.isControlDown())
@@ -493,6 +493,7 @@ public class MainFrame extends javax.swing.JFrame
 				{
 					sngList.setSelectedIndex(sngList.getSelectedIndex()+1);
 				}
+				sngList.ensureIndexIsVisible(sngList.getSelectedIndex());
 			}
 			case KeyEvent.VK_SPACE -> play();
 			case KeyEvent.VK_LEFT -> {
@@ -627,23 +628,32 @@ public class MainFrame extends javax.swing.JFrame
 	private void showSngListPopup(MouseEvent evt)
 	{
 		int row = sngList.locationToIndex(evt.getPoint());
-		sngList.setSelectedIndex(row);
+		if (!sngList.isSelectedIndex(row))
+			sngList.setSelectedIndex(row);
 
 		JPopupMenu popupMenu = new JPopupMenu();
 
 		JMenuItem miRemove = new JMenuItem("Remove");
-		miRemove.addActionListener((ActionEvent e) -> {
-			if (playlist.currentSong == row)
-				player.next();
-			if (playlist.currentSong == row)
-				player.stop();
-			playlist.removeSong(row);
-			updatePlayIcon();
+		miRemove.addActionListener((ActionEvent ev) -> {
+			while(sngList.getSelectedIndex() != -1)
+			{
+				int index = sngList.getSelectedIndex();
+				if (playlist.currentSong == index)
+				{
+					player.next();
+				}
+				if (playlist.currentSong == index)
+				{
+					player.stop();
+				}
+				playlist.removeSong(index);
+				updatePlayIcon();
+			}
 		});
 
 		JMenuItem miPlay = new JMenuItem("Play");
 		miPlay.addActionListener((ActionEvent e) -> {
-			player.play(row);
+			player.play(sngList.getSelectedIndex());
 			updatePlayIcon();
 		});
 
@@ -660,16 +670,12 @@ public class MainFrame extends javax.swing.JFrame
 		case SongPlayer.PAUSED -> player.resume();
 		case SongPlayer.PLAYING -> player.pause();
 		default -> {
-			}
+		}
 		}
 		updatePlayIcon();
 	}
 
 
-	public static void main(String args[])
-	{
-
-	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btmPanel;
@@ -703,9 +709,12 @@ public class MainFrame extends javax.swing.JFrame
 	private void updatePlayIcon() {
 
 		switch (player.status) {
-			case SongPlayer.STOPED -> btnPlay.setIcon(imgPlay);
-			case SongPlayer.PAUSED -> btnPlay.setIcon(imgPlay);
-			case SongPlayer.PLAYING -> btnPlay.setIcon(imgPause);
+			case SongPlayer.STOPED ->
+				btnPlay.setIcon(imgPlay);
+			case SongPlayer.PAUSED ->
+				btnPlay.setIcon(imgPlay);
+			case SongPlayer.PLAYING ->
+				btnPlay.setIcon(imgPause);
 			default -> {
 			}
 		}
