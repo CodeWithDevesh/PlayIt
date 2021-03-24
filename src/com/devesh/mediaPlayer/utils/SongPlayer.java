@@ -1,4 +1,4 @@
-package com.devesh.mediaPlayer;
+package com.devesh.mediaPlayer.utils;
 
 import com.devesh.mediaPlayer.swing.MainFrame;
 import java.io.FileInputStream;

@@ -1,6 +1,6 @@
 package com.devesh.mediaPlayer.listHelpers;
 
-import com.devesh.mediaPlayer.Playlist;
+import com.devesh.mediaPlayer.utils.Playlist;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;

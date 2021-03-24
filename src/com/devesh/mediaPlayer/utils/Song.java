@@ -1,4 +1,4 @@
-package com.devesh.mediaPlayer;
+package com.devesh.mediaPlayer.utils;
 
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;

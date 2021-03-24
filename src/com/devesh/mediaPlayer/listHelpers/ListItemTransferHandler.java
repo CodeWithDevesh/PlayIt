@@ -1,8 +1,8 @@
 package com.devesh.mediaPlayer.listHelpers;
 
-import com.devesh.mediaPlayer.Playlist;
-import com.devesh.mediaPlayer.Song;
-import com.devesh.mediaPlayer.SongPlayer;
+import com.devesh.mediaPlayer.utils.Playlist;
+import com.devesh.mediaPlayer.utils.Song;
+import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.UnsupportedTagException;
 import java.awt.datatransfer.DataFlavor;
