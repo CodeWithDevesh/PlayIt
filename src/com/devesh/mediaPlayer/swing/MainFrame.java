@@ -317,100 +317,54 @@ public class MainFrame extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOpnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpnActionPerformed
-		openMedia();
+		Application.showOpenDialog();
     }//GEN-LAST:event_btnOpnActionPerformed
+	
 
-
-	public void openMedia()
+	public void openMedia(File[] files)
 	{
-		metaDir.mkdirs();
+		File file = files[0];
+		String filename = file.getPath();
 
-		File lastLoc = new File(metaDir.getPath() + "\\lastLoc.dat");
-
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.setMultiSelectionEnabled(true);
-		fileChooser.setFileFilter(
-				new FileNameExtensionFilter("Music Files", "mp3", "ppl"));
-		fileChooser.removeChoosableFileFilter(
-				fileChooser.getAcceptAllFileFilter());
-
-		if (lastLoc.exists())
+		if (filename.endsWith(".ppl"))
 		{
 			try
 			{
-				Scanner scanner = new Scanner(lastLoc);
-				File file = new File(scanner.nextLine());
-				if (file.exists())
-					fileChooser.setCurrentDirectory(file);
-			} catch (FileNotFoundException ex)
-			{
-				Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE,
-						null, ex);
-			}
-		}
-
-		int i = fileChooser.showOpenDialog(this);
-		if (i == JFileChooser.APPROVE_OPTION)
-		{
-			File file = fileChooser.getSelectedFile();
-			String filename = file.getPath();
-
-			if (filename.endsWith(".ppl"))
-			{
-				try
+				try (ObjectInputStream oi = new ObjectInputStream(
+						new FileInputStream(file)))
 				{
-					try (ObjectInputStream oi = new ObjectInputStream(
-							new FileInputStream(file)))
-					{
-						player.stop();
-						playlist = (Playlist) oi.readObject();
-						playlist.currentSong = 0;
-						sngList.setModel(playlist.getListModel());
-						sngList.setTransferHandler(
-								new ListItemTransferHandler(playlist, player));
-						sngList.setCellRenderer(
-								new SngListCellRenderer(playlist));
-						player.changePlaylist(playlist);
-						play();
-						sngTitle.setText(playlist.getCurrentSong().getTitle());
-						oi.close();
-					}
-				} catch (IOException | ClassNotFoundException ex)
-				{
-					Logger.getLogger(MainFrame.class.getName())
-							.log(Level.SEVERE, null, ex);
-				}
-			} else
-			{
-				playlist.addSongs(new ArrayList<>(
-						Arrays.asList(fileChooser.getSelectedFiles())));
-				if (player.status == SongPlayer.STOPED)
-				{
+					player.stop();
+					playlist = (Playlist) oi.readObject();
+					playlist.currentSong = 0;
+					sngList.setModel(playlist.getListModel());
+					sngList.setTransferHandler(
+							new ListItemTransferHandler(playlist, player));
+					sngList.setCellRenderer(
+							new SngListCellRenderer(playlist));
+					player.changePlaylist(playlist);
 					play();
 					sngTitle.setText(playlist.getCurrentSong().getTitle());
-				} else if (player.status == SongPlayer.PAUSED)
-				{
-					player.play(sngList.getModel().getSize() - 1);
+					oi.close();
 				}
-			}
-		}
-		if (lastLoc.exists())
-			lastLoc.delete();
-		try
-		{
-			lastLoc.createNewFile();
-			try (BufferedWriter bw = new BufferedWriter(
-					new FileWriter(lastLoc)))
+			} catch (IOException | ClassNotFoundException ex)
 			{
-				bw.write(fileChooser.getCurrentDirectory().getPath());
-				bw.close();
+				Logger.getLogger(MainFrame.class.getName())
+						.log(Level.SEVERE, null, ex);
 			}
-		} catch (IOException ex)
+		} else
 		{
-			Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null,
-					ex);
+			playlist.addSongs(new ArrayList<>(
+					Arrays.asList(files)));
+			if (player.status == SongPlayer.STOPED)
+			{
+				play();
+				sngTitle.setText(playlist.getCurrentSong().getTitle());
+			} else if (player.status == SongPlayer.PAUSED)
+			{
+				player.play(sngList.getModel().getSize() - 1);
+			}
 		}
+
 		updatePlayIcon();
 	}
 
@@ -811,6 +765,7 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JLabel sngTitle;
     private javax.swing.JPanel spPanel;
     // End of variables declaration//GEN-END:variables
-	private final File metaDir = new File(System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
 	private int cursor = -1;
+	private static final File metaDir = new File(
+			System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
 }
