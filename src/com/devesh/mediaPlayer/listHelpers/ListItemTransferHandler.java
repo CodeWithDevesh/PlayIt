@@ -11,6 +11,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,15 +35,12 @@ public class ListItemTransferHandler extends TransferHandler {
 		if (action == MOVE)
 		{
 			JList<String> jList = (JList<String>) source;
-			int[] x = jList.getSelectedIndices();
-			for(int a : x)
-			{
+			int a = jList.getSelectedIndex();
 				if (playlist.currentSong == a)
 					player.next();
 				if (playlist.currentSong == a)
 					player.stop();
 				playlist.removeSong(a);
-			}
 		}
 	}
 
@@ -81,26 +79,34 @@ public class ListItemTransferHandler extends TransferHandler {
 		try
 		{
 			Transferable t = support.getTransferable();
-			File file;
-			
+			List<File> files;
+
 			if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-				file = ((List<File>) t
-						.getTransferData(DataFlavor.javaFileListFlavor)).get(0);
+				files = ((List<File>) t
+						.getTransferData(DataFlavor.javaFileListFlavor));
 			else
-				file = new File(
-						(String) t.getTransferData(DataFlavor.stringFlavor));
-			
+			{
+				files = new ArrayList<>();
+				files.add(new File(
+						(String) t.getTransferData(DataFlavor.stringFlavor)));
+			}
+
 			javax.swing.JList.DropLocation loc = (javax.swing.JList.DropLocation) support
 					.getDropLocation();
-			
+
 			Song song;
-			try{
-				song = new Song(file);
-			} catch (InvalidDataException | UnsupportedTagException ex) {
+			try
+			{
+				for(int i = 0; i < files.size(); i++)
+				{
+					song = new Song(files.get(i));
+					playlist.addSong(song, loc.getIndex()+i);
+				}
+			} catch (InvalidDataException | UnsupportedTagException ex)
+			{
 				return false;
 			}
-			
-			playlist.addSong(song, loc.getIndex());
+
 		} catch (UnsupportedFlavorException | IOException ex)
 		{
 			Logger.getLogger(ListItemTransferHandler.class.getName())

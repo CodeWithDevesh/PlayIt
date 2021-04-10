@@ -31,10 +31,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-/**
- *
- * @author Devesh
- */
+
 public class MainFrame extends javax.swing.JFrame
 		implements SongPlayer.SongChangeListener {
 
