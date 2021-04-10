@@ -36,11 +36,14 @@ public class ListItemTransferHandler extends TransferHandler {
 		{
 			JList<String> jList = (JList<String>) source;
 			int a = jList.getSelectedIndex();
+			if (player != null)
+			{
 				if (playlist.currentSong == a)
 					player.next();
 				if (playlist.currentSong == a)
 					player.stop();
-				playlist.removeSong(a);
+			}
+			playlist.removeSong(a);
 		}
 	}
 
@@ -97,10 +100,10 @@ public class ListItemTransferHandler extends TransferHandler {
 			Song song;
 			try
 			{
-				for(int i = 0; i < files.size(); i++)
+				for(int i = 0 ; i < files.size() ; i++)
 				{
 					song = new Song(files.get(i));
-					playlist.addSong(song, loc.getIndex()+i);
+					playlist.addSong(song, loc.getIndex() + i);
 				}
 			} catch (InvalidDataException | UnsupportedTagException ex)
 			{

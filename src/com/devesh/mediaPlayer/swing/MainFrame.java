@@ -1,6 +1,7 @@
 package com.devesh.mediaPlayer.swing;
 
 import com.devesh.mediaPlayer.Application;
+import com.devesh.mediaPlayer.autostart.AutostartSetter;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.devesh.mediaPlayer.listHelpers.SngListCellRenderer;
@@ -90,6 +91,8 @@ public class MainFrame extends javax.swing.JFrame
         btnOpn = new javax.swing.JMenuItem();
         btnShuffel = new javax.swing.JMenuItem();
         btnQuit = new javax.swing.JMenuItem();
+        mItmEdit = new javax.swing.JMenu();
+        btnAutostart = new javax.swing.JMenuItem();
 
         setMinimumSize(new java.awt.Dimension(300, 250));
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -202,7 +205,6 @@ public class MainFrame extends javax.swing.JFrame
         getContentPane().add(btmPanel, java.awt.BorderLayout.SOUTH);
 
         jScrollPane.setBorder(null);
-        jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane.setAutoscrolls(true);
         jScrollPane.setViewportView(null);
 
@@ -307,6 +309,18 @@ public class MainFrame extends javax.swing.JFrame
 
         menu.add(mItmFile);
 
+        mItmEdit.setText("Edit");
+
+        btnAutostart.setText("Autostart");
+        btnAutostart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAutostartActionPerformed(evt);
+            }
+        });
+        mItmEdit.add(btnAutostart);
+
+        menu.add(mItmEdit);
+
         setJMenuBar(menu);
 
         pack();
@@ -314,7 +328,9 @@ public class MainFrame extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOpnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpnActionPerformed
-		Application.showOpenDialog();
+		File[] files = Application.showOpenDialog();
+		if(files != null)
+			openMedia(files);
     }//GEN-LAST:event_btnOpnActionPerformed
 	
 
@@ -577,6 +593,11 @@ public class MainFrame extends javax.swing.JFrame
 		save();
     }//GEN-LAST:event_btnSaveActionPerformed
 
+    private void btnAutostartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAutostartActionPerformed
+		AutostartSetter setter = new AutostartSetter(this, true);
+		setter.setVisible(true);
+    }//GEN-LAST:event_btnAutostartActionPerformed
+
 
 	public void save()
 	{
@@ -744,6 +765,7 @@ public class MainFrame extends javax.swing.JFrame
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btmPanel;
+    private javax.swing.JMenuItem btnAutostart;
     private javax.swing.JButton btnNext;
     private javax.swing.JMenuItem btnOpn;
     private javax.swing.JPanel btnPanel;
@@ -754,6 +776,7 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JMenuItem btnShuffel;
     private javax.swing.JPanel ctrlPanel;
     private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JMenu mItmEdit;
     private javax.swing.JMenu mItmFile;
     private javax.swing.JMenuBar menu;
     public static javax.swing.JSlider progressBar;

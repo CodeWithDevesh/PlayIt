@@ -25,7 +25,7 @@ public class Application {
 	private static Tray tray;
 	private static SongPlayer player;
 	private static Playlist playlist;
-	private static final File metaDir = new File(
+	public static final File metaDir = new File(
 			System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
 
 	public static void main(String[] args)
@@ -80,7 +80,7 @@ public class Application {
 	}
 
 
-	public static void showOpenDialog()
+	public static File[] showOpenDialog()
 	{
 		metaDir.mkdirs();
 
@@ -111,9 +111,6 @@ public class Application {
 
 		int i = fileChooser.showOpenDialog(null);
 
-		if (i == JFileChooser.APPROVE_OPTION)
-			frame.openMedia(fileChooser.getSelectedFiles());
-
 		if (lastLoc.exists())
 			lastLoc.delete();
 		try
@@ -130,5 +127,12 @@ public class Application {
 			Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null,
 					ex);
 		}
+		if (i == JFileChooser.APPROVE_OPTION)
+			return fileChooser.getSelectedFiles();
+		return null;
+	}
+	
+	public static Playlist getPlaylist(){
+		return playlist;
 	}
 }
