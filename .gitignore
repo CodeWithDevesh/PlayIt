@@ -1,2 +1,10 @@
 /Installers/
 /jre/
+/launcher/Debug/
+/launcher/x64/
+/launcher/.vs/
+/launcher/PlayIt Launcher/Debug/
+/launcher/PlayIt Launcher/x64/
+/PlayIt.exe
+/PlayIt.pdb
+/PlayIt.ilk

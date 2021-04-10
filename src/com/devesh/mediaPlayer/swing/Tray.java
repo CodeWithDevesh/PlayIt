@@ -51,7 +51,7 @@ public class Tray {
 		tray.getMenu().add(new JSeparator());
 
 		tray.getMenu().add(new MenuItem("Open", (ActionEvent e) -> {
-			frame.openMedia();
+			Application.showOpenDialog();
 		}));
 
 		tray.getMenu().add(new MenuItem("Shuffel", (ActionEvent e) -> {

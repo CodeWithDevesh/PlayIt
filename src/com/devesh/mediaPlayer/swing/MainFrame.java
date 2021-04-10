@@ -1,6 +1,7 @@
 package com.devesh.mediaPlayer.swing;
 
 import com.devesh.mediaPlayer.Application;
+import com.devesh.mediaPlayer.autostart.AutostartSetter;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.devesh.mediaPlayer.listHelpers.SngListCellRenderer;
@@ -31,10 +32,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-/**
- *
- * @author Devesh
- */
+
 public class MainFrame extends javax.swing.JFrame
 		implements SongPlayer.SongChangeListener {
 
@@ -93,6 +91,8 @@ public class MainFrame extends javax.swing.JFrame
         btnOpn = new javax.swing.JMenuItem();
         btnShuffel = new javax.swing.JMenuItem();
         btnQuit = new javax.swing.JMenuItem();
+        mItmEdit = new javax.swing.JMenu();
+        btnAutostart = new javax.swing.JMenuItem();
 
         setMinimumSize(new java.awt.Dimension(300, 250));
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -205,7 +205,6 @@ public class MainFrame extends javax.swing.JFrame
         getContentPane().add(btmPanel, java.awt.BorderLayout.SOUTH);
 
         jScrollPane.setBorder(null);
-        jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane.setAutoscrolls(true);
         jScrollPane.setViewportView(null);
 
@@ -310,6 +309,18 @@ public class MainFrame extends javax.swing.JFrame
 
         menu.add(mItmFile);
 
+        mItmEdit.setText("Edit");
+
+        btnAutostart.setText("Autostart");
+        btnAutostart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAutostartActionPerformed(evt);
+            }
+        });
+        mItmEdit.add(btnAutostart);
+
+        menu.add(mItmEdit);
+
         setJMenuBar(menu);
 
         pack();
@@ -317,100 +328,56 @@ public class MainFrame extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOpnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpnActionPerformed
-		openMedia();
+		File[] files = Application.showOpenDialog();
+		if(files != null)
+			openMedia(files);
     }//GEN-LAST:event_btnOpnActionPerformed
+	
 
-
-	public void openMedia()
+	public void openMedia(File[] files)
 	{
-		metaDir.mkdirs();
+		File file = files[0];
+		String filename = file.getPath();
 
-		File lastLoc = new File(metaDir.getPath() + "\\lastLoc.dat");
-
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fileChooser.setMultiSelectionEnabled(true);
-		fileChooser.setFileFilter(
-				new FileNameExtensionFilter("Music Files", "mp3", "ppl"));
-		fileChooser.removeChoosableFileFilter(
-				fileChooser.getAcceptAllFileFilter());
-
-		if (lastLoc.exists())
+		if (filename.endsWith(".ppl"))
 		{
 			try
 			{
-				Scanner scanner = new Scanner(lastLoc);
-				File file = new File(scanner.nextLine());
-				if (file.exists())
-					fileChooser.setCurrentDirectory(file);
-			} catch (FileNotFoundException ex)
-			{
-				Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE,
-						null, ex);
-			}
-		}
-
-		int i = fileChooser.showOpenDialog(this);
-		if (i == JFileChooser.APPROVE_OPTION)
-		{
-			File file = fileChooser.getSelectedFile();
-			String filename = file.getPath();
-
-			if (filename.endsWith(".ppl"))
-			{
-				try
+				try (ObjectInputStream oi = new ObjectInputStream(
+						new FileInputStream(file)))
 				{
-					try (ObjectInputStream oi = new ObjectInputStream(
-							new FileInputStream(file)))
-					{
-						player.stop();
-						playlist = (Playlist) oi.readObject();
-						playlist.currentSong = 0;
-						sngList.setModel(playlist.getListModel());
-						sngList.setTransferHandler(
-								new ListItemTransferHandler(playlist, player));
-						sngList.setCellRenderer(
-								new SngListCellRenderer(playlist));
-						player.changePlaylist(playlist);
-						play();
-						sngTitle.setText(playlist.getCurrentSong().getTitle());
-						oi.close();
-					}
-				} catch (IOException | ClassNotFoundException ex)
-				{
-					Logger.getLogger(MainFrame.class.getName())
-							.log(Level.SEVERE, null, ex);
-				}
-			} else
-			{
-				playlist.addSongs(new ArrayList<>(
-						Arrays.asList(fileChooser.getSelectedFiles())));
-				if (player.status == SongPlayer.STOPED)
-				{
+					player.stop();
+					playlist = (Playlist) oi.readObject();
+					playlist.currentSong = 0;
+					sngList.setModel(playlist.getListModel());
+					sngList.setTransferHandler(
+							new ListItemTransferHandler(playlist, player));
+					sngList.setCellRenderer(
+							new SngListCellRenderer(playlist));
+					player.changePlaylist(playlist);
 					play();
 					sngTitle.setText(playlist.getCurrentSong().getTitle());
-				} else if (player.status == SongPlayer.PAUSED)
-				{
-					player.play(sngList.getModel().getSize() - 1);
+					oi.close();
 				}
-			}
-		}
-		if (lastLoc.exists())
-			lastLoc.delete();
-		try
-		{
-			lastLoc.createNewFile();
-			try (BufferedWriter bw = new BufferedWriter(
-					new FileWriter(lastLoc)))
+			} catch (IOException | ClassNotFoundException ex)
 			{
-				bw.write(fileChooser.getCurrentDirectory().getPath());
-				bw.close();
+				Logger.getLogger(MainFrame.class.getName())
+						.log(Level.SEVERE, null, ex);
 			}
-		} catch (IOException ex)
+		} else
 		{
-			Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null,
-					ex);
+			playlist.addSongs(new ArrayList<>(
+					Arrays.asList(files)));
+			if (player.status == SongPlayer.STOPED)
+			{
+				play();
+				sngTitle.setText(playlist.getCurrentSong().getTitle());
+			} else if (player.status == SongPlayer.PAUSED)
+			{
+				player.play(sngList.getModel().getSize() - 1);
+			}
 		}
+
 		updatePlayIcon();
 	}
 
@@ -626,6 +593,11 @@ public class MainFrame extends javax.swing.JFrame
 		save();
     }//GEN-LAST:event_btnSaveActionPerformed
 
+    private void btnAutostartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAutostartActionPerformed
+		AutostartSetter setter = new AutostartSetter(this, true);
+		setter.setVisible(true);
+    }//GEN-LAST:event_btnAutostartActionPerformed
+
 
 	public void save()
 	{
@@ -793,6 +765,7 @@ public class MainFrame extends javax.swing.JFrame
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btmPanel;
+    private javax.swing.JMenuItem btnAutostart;
     private javax.swing.JButton btnNext;
     private javax.swing.JMenuItem btnOpn;
     private javax.swing.JPanel btnPanel;
@@ -803,6 +776,7 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JMenuItem btnShuffel;
     private javax.swing.JPanel ctrlPanel;
     private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JMenu mItmEdit;
     private javax.swing.JMenu mItmFile;
     private javax.swing.JMenuBar menu;
     public static javax.swing.JSlider progressBar;
@@ -811,6 +785,7 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JLabel sngTitle;
     private javax.swing.JPanel spPanel;
     // End of variables declaration//GEN-END:variables
-	private final File metaDir = new File(System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
 	private int cursor = -1;
+	private static final File metaDir = new File(
+			System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
 }

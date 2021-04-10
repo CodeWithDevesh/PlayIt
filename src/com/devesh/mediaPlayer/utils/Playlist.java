@@ -46,6 +46,11 @@ public class Playlist implements Serializable {
 		this.songs = new DefaultListModel<>();
 		this.songs.addElement(song.getTitle());
 	}
+	
+	public Playlist(Playlist playlist){
+		this.list = playlist.list;
+		this.songs = playlist.songs;
+	}
 
 
 	public void addSong(Song song)
