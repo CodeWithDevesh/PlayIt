@@ -25,9 +25,12 @@ public class Playlist implements Serializable {
 		ArrayList<Song> songList = new ArrayList<>();
 
 		files.forEach((File file) -> {
-			try {
+			try
+			{
 				songList.add(new Song(file));
-			} catch (InvalidDataException | IOException | UnsupportedTagException ex) {
+			} catch (InvalidDataException | IOException
+					| UnsupportedTagException ex)
+			{
 			}
 		});
 
@@ -46,8 +49,9 @@ public class Playlist implements Serializable {
 		this.songs = new DefaultListModel<>();
 		this.songs.addElement(song.getTitle());
 	}
-	
-	public Playlist(Playlist playlist){
+
+
+	public Playlist(Playlist playlist) {
 		this.list = playlist.list;
 		this.songs = playlist.songs;
 	}
@@ -62,7 +66,7 @@ public class Playlist implements Serializable {
 
 	public void addSong(Song song, int index)
 	{
-		if(currentSong >= index)
+		if (currentSong >= index)
 			currentSong++;
 		list.add(index, song);
 		songs.add(index, song.getTitle());
@@ -73,12 +77,17 @@ public class Playlist implements Serializable {
 	{
 		ArrayList<Song> songList = new ArrayList<>();
 
-		files.forEach(file -> {
-			try {
+		for(int i=0; i < files.size(); i++)
+		{
+			File file = files.get(i);
+			try
+			{
 				songList.add(new Song(file));
-			} catch (InvalidDataException | IOException | UnsupportedTagException ex) {
+			} catch (InvalidDataException | IOException
+					| UnsupportedTagException ex)
+			{
 			}
-		});
+		}
 
 		list.addAll(songList);
 
@@ -87,9 +96,12 @@ public class Playlist implements Serializable {
 		});
 	}
 
-	public Song getSong(int index){
+
+	public Song getSong(int index)
+	{
 		return list.get(index);
 	}
+
 
 	public void removeSong(int index)
 	{
@@ -183,5 +195,11 @@ public class Playlist implements Serializable {
 			return true;
 		}
 		return false;
+	}
+
+
+	public int size()
+	{
+		return list.size();
 	}
 }

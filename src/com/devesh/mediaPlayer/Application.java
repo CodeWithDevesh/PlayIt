@@ -1,5 +1,6 @@
 package com.devesh.mediaPlayer;
 
+import com.devesh.mediaPlayer.RMI.OpenRMI;
 import com.devesh.mediaPlayer.swing.MainFrame;
 import com.devesh.mediaPlayer.swing.Tray;
 import com.devesh.mediaPlayer.utils.Playlist;
@@ -11,6 +12,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,17 +26,25 @@ import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class Application {
+public class Application implements OpenRMI {
 
 	private static MainFrame frame;
 	private static Tray tray;
 	private static SongPlayer player;
 	private static Playlist playlist;
+	private static final String RMI_ENTRY = "PlayItApplication";
+	private static final Application app = new Application();
 	public static final File metaDir = new File(
 			System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
 
 	public static void main(String[] args)
 	{
+		try {
+			initRMI(args);
+		} catch (RemoteException | NotBoundException ex) {
+			ex.printStackTrace();
+			System.exit(-1);
+		}
 		try
 		{
 			UIManager.setLookAndFeel(new FlatDarkLaf());
@@ -54,21 +69,47 @@ public class Application {
 					ex);
 		}
 		frame.requestFocus();
-		if (args.length > 0)
-			if ("visible".equals(args[0]))
-				frame.setVisible(true);
-		
+
 		player.addSongChangeListener(frame);
 
 		tray = new Tray(player, playlist, frame);
-		
-		
-		if(args.length > 1){
-			File[] files = new File[args.length-1];
-			for(int i = 1; i <= files.length; i++){
-				files[i-1] = new File(args[i]);
+
+		if (args.length > 0)
+		{
+			File[] files = new File[args.length];
+			for(int i = 0 ; i < files.length ; i++)
+			{
+				System.out.println(args[i]);
+				files[i] = new File(args[i]);
 			}
 			frame.openMedia(files);
+		} else
+			frame.setVisible(true);
+	}
+
+
+	private static void initRMI(String[] args)
+			throws RemoteException, NotBoundException
+	{
+		Registry registry;
+		try
+		{
+			registry = LocateRegistry.createRegistry(2020);
+		} catch (RemoteException ex)
+		{
+			registry = LocateRegistry.getRegistry(2020);
+		}
+		
+		try
+		{
+			OpenRMI openRMI = (OpenRMI) UnicastRemoteObject.exportObject(app,
+					0);
+			registry.bind(RMI_ENTRY, openRMI);
+		} catch (AlreadyBoundException ex)
+		{
+			OpenRMI openRMI1 = (OpenRMI) registry.lookup(RMI_ENTRY);
+			openRMI1.open(args);
+			System.exit(0);
 		}
 	}
 
@@ -131,8 +172,40 @@ public class Application {
 			return fileChooser.getSelectedFiles();
 		return null;
 	}
-	
-	public static Playlist getPlaylist(){
+
+
+	public static Playlist getPlaylist()
+	{
 		return playlist;
+	}
+
+
+	@Override
+	public void open(String[] args) throws RemoteException
+	{
+		if (args.length > 0)
+		{
+			File[] files = new File[args.length];
+			for(int i = 0 ; i < files.length ; i++)
+			{
+				System.out.println(args[i]);
+				files[i] = new File(args[i]);
+			}
+			frame.openMedia(files);
+			player.play(playlist.size()-1);
+		} else
+		{
+			frame.setVisible(true);
+			frame.toFront();
+		}
+	}
+	
+	public static void setPlaylist(Playlist playlist){
+		playlist.currentSong = 0;
+		player.stop();
+		Application.playlist = playlist;
+		player.changePlaylist(playlist);
+		frame.setPlaylist(playlist);
+		player.play();
 	}
 }

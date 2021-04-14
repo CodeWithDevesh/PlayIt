@@ -17,8 +17,7 @@ public class Song implements Serializable {
 		this.file = file;
 
 		Mp3File mp3File = new Mp3File(file);
-
-		title = mp3File.getId3v2Tag().getTitle();
+		title = mp3File.getId3v1Tag().getTitle();
 		length = (int) mp3File.getLengthInMilliseconds();
 
 		if (title == null)

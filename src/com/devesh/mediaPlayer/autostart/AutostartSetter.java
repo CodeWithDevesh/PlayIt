@@ -47,8 +47,7 @@ public class AutostartSetter extends javax.swing.JDialog {
 				oi.close();
 			} catch (IOException | ClassNotFoundException ex)
 			{
-				Logger.getLogger(AutostartSetter.class.getName())
-						.log(Level.SEVERE, null, ex);
+				playlist = new Playlist();
 			}
 		} else
 			playlist = new Playlist();
