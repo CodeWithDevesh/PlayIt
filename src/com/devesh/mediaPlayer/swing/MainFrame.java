@@ -442,9 +442,8 @@ public class MainFrame extends javax.swing.JFrame
 			case KeyEvent.VK_DOWN -> {
 				if(evt.isControlDown())
 					sldVolume.setValue(sldVolume.getValue() - 5);
-				else if(evt.isShiftDown()){
+				else if(evt.isShiftDown())
 					moveDown(true);
-				}
 				else
 					moveDown(false);
 			}
@@ -454,19 +453,22 @@ public class MainFrame extends javax.swing.JFrame
 			case KeyEvent.VK_LEFT -> {
 				if(evt.isControlDown()){
 					player.previous();
-					
+					sngList.ensureIndexIsVisible(playlist.currentSong);
 				}
 			}
 			
 			case KeyEvent.VK_RIGHT -> {
-				if(evt.isControlDown())
+				if(evt.isControlDown()){
 					player.next();
+					sngList.ensureIndexIsVisible(playlist.currentSong);
+				}
 			}
 			
 			case KeyEvent.VK_ENTER -> {
 				index = sngList.getSelectedIndex();
-				if(index != -1)
+				if(index != -1){
 					player.play(index);
+				}
 			}
 			
 			case KeyEvent.VK_NUMPAD5 -> {
@@ -477,6 +479,11 @@ public class MainFrame extends javax.swing.JFrame
 			
 			case KeyEvent.VK_DELETE -> {
 				removeSelected();
+			}
+			
+			case KeyEvent.VK_W -> {
+				if(evt.isControlDown())
+					setVisible(false);
 			}
 			
 			default -> {
