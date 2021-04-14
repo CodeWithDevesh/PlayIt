@@ -9,3 +9,6 @@
 /PlayIt.pdb
 /PlayIt.ilk
 *.log
+/PlayIt Launch4j.xml
+/PlayIt Launcher/launcher/Debug/
+/PlayIt Launcher/.vs/

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by PlayIt Launcher.rc
+// Used by launcher.rc
 //
 #define IDI_ICON1                       101
 
