@@ -13,11 +13,17 @@ public class Song implements Serializable {
 	private String title;
 	private final int length;
 
-	public Song(File file) throws InvalidDataException, IOException, UnsupportedTagException {
+	public Song(File file)
+			throws InvalidDataException, IOException, UnsupportedTagException {
 		this.file = file;
 
 		Mp3File mp3File = new Mp3File(file);
-		title = mp3File.getId3v1Tag().getTitle();
+		
+		if (mp3File.getId3v1Tag() != null)
+			title = mp3File.getId3v1Tag().getTitle();
+		else if (mp3File.getId3v2Tag() != null)
+			title = mp3File.getId3v2Tag().getTitle();
+		
 		length = (int) mp3File.getLengthInMilliseconds();
 
 		if (title == null)

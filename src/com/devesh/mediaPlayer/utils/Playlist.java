@@ -77,17 +77,15 @@ public class Playlist implements Serializable {
 	{
 		ArrayList<Song> songList = new ArrayList<>();
 
-		for(int i=0; i < files.size(); i++)
-		{
-			File file = files.get(i);
+		files.forEach(file -> {
 			try
 			{
 				songList.add(new Song(file));
 			} catch (InvalidDataException | IOException
-					| UnsupportedTagException ex)
+			  | UnsupportedTagException ex)
 			{
 			}
-		}
+		});
 
 		list.addAll(songList);
 
