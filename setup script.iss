@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "PlayIt"
-#define MyAppVersion "1.1"
+#define MyAppVersion "0.2"
 #define MyAppExeName "PlayIt.exe"
 #define MyAppAssocName MyAppName + " Playlist"
 #define MyAppAssocExt ".ppl"
@@ -23,7 +23,7 @@ AllowNoIcons=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=Installers
-OutputBaseFilename=PlayIt-1.0
+OutputBaseFilename=PlayIt-0.2
 SetupIconFile=icon.ico
 Compression=lzma
 SolidCompression=yes
@@ -38,9 +38,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "jre\*"; DestDir: "{app}\jre"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dlls\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "dist\*"; DestDir: "{app}\dist"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "reg.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "reg_x64.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]
@@ -55,6 +54,10 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\DefaultIcon"; ValueType
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\shell\open"; ValueType: string; ValueName: "MultiSelectModel"; ValueData: ""
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\shell\open"; ValueType: string; ValueName: ""; ValueData: "Play"
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+
+Root: HKCR; Subkey: "PlayIt-Launcher"; ValueType: string; ValueName: ""; ValueData: "PlayIt Launcher"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "PlayIt-Launcher"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Flags: uninsdeletekey
+Root: HKCR; Subkey: "PlayIt-Launcher\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
