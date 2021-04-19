@@ -71,7 +71,7 @@
 
     -->
     
-    <target name="-post-jar">
+<!--    <target name="-post-jar">
 
         <property name="store.jar.name" value="PlayIt"/>
 
@@ -102,6 +102,6 @@
 
         <delete dir="${temp.dir}"/>
 
-    </target>
+    </target>-->
     
 </project>

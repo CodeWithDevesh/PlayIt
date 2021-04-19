@@ -1,6 +1,7 @@
 package com.devesh.mediaPlayer;
 
 import com.devesh.mediaPlayer.RMI.OpenRMI;
+import com.devesh.mediaPlayer.httpServer.Server;
 import com.devesh.mediaPlayer.swing.MainFrame;
 import com.devesh.mediaPlayer.swing.Tray;
 import com.devesh.mediaPlayer.utils.Playlist;
@@ -19,12 +20,12 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Application implements OpenRMI {
 
@@ -37,14 +38,24 @@ public class Application implements OpenRMI {
 	public static final File metaDir = new File(
 			System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
 
+	private static final int RMIPort = 2023, httpPort = 2021;
+	private static Logger logger;
+
 	public static void main(String[] args)
 	{
-		try {
+		try
+		{
 			initRMI(args);
-		} catch (RemoteException | NotBoundException ex) {
+		} catch (RemoteException | NotBoundException ex)
+		{
 			ex.printStackTrace();
 			System.exit(-1);
 		}
+
+		new Server(httpPort);
+
+		logger = LoggerFactory.getLogger(Application.class);
+
 		try
 		{
 			UIManager.setLookAndFeel(new FlatDarkLaf());
@@ -65,8 +76,7 @@ public class Application implements OpenRMI {
 			frame.setIconImage(img);
 		} catch (IOException ex)
 		{
-			Logger.getLogger(Tray.class.getName()).log(Level.SEVERE, null,
-					ex);
+			logger.error(null, ex);
 		}
 		frame.requestFocus();
 
@@ -94,12 +104,12 @@ public class Application implements OpenRMI {
 		Registry registry;
 		try
 		{
-			registry = LocateRegistry.createRegistry(2020);
+			registry = LocateRegistry.createRegistry(RMIPort);
 		} catch (RemoteException ex)
 		{
-			registry = LocateRegistry.getRegistry(2020);
+			registry = LocateRegistry.getRegistry(RMIPort);
 		}
-		
+
 		try
 		{
 			OpenRMI openRMI = (OpenRMI) UnicastRemoteObject.exportObject(app,
@@ -145,8 +155,7 @@ public class Application implements OpenRMI {
 					fileChooser.setCurrentDirectory(file);
 			} catch (FileNotFoundException ex)
 			{
-				Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE,
-						null, ex);
+				logger.error(null, ex);
 			}
 		}
 
@@ -165,8 +174,7 @@ public class Application implements OpenRMI {
 			}
 		} catch (IOException ex)
 		{
-			Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null,
-					ex);
+			logger.error(null, ex);
 		}
 		if (i == JFileChooser.APPROVE_OPTION)
 			return fileChooser.getSelectedFiles();
@@ -188,19 +196,38 @@ public class Application implements OpenRMI {
 			File[] files = new File[args.length];
 			for(int i = 0 ; i < files.length ; i++)
 			{
-				System.out.println(args[i]);
 				files[i] = new File(args[i]);
 			}
 			frame.openMedia(files);
-			player.play(playlist.size()-1);
+			player.play(playlist.size() - 1);
 		} else
 		{
 			frame.setVisible(true);
+			frame.requestFocus();
 			frame.toFront();
 		}
 	}
-	
-	public static void setPlaylist(Playlist playlist){
+
+
+	public static void open(String file)
+	{
+		if (file != null && !file.isBlank())
+		{
+			File[] files = new File[1];
+			files[0] = new File(file);
+			frame.openMedia(files);
+			player.play(playlist.size() - 1);
+		} else
+		{
+			frame.setVisible(true);
+			frame.requestFocus();
+			frame.toFront();
+		}
+	}
+
+
+	public static void setPlaylist(Playlist playlist)
+	{
 		playlist.currentSong = 0;
 		player.stop();
 		Application.playlist = playlist;

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "PlayIt"
-#define MyAppVersion "0.2"
+#define MyAppVersion "0.3"
 #define MyAppExeName "PlayIt.exe"
 #define MyAppAssocName MyAppName + " Playlist"
 #define MyAppAssocExt ".ppl"
@@ -23,7 +23,7 @@ AllowNoIcons=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=Installers
-OutputBaseFilename=PlayIt-0.2
+OutputBaseFilename=PlayIt-0.3
 SetupIconFile=icon.ico
 Compression=lzma
 SolidCompression=yes
@@ -51,13 +51,9 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; Value
 Root: HKA; Subkey: "Software\Classes\.mp3\OpenWithProgids"; ValueType: string; ValueName: "{#MyAppAssocKeyMP3}"; ValueData: ""; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppAssocName}"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
-Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\shell\open"; ValueType: string; ValueName: "MultiSelectModel"; ValueData: ""
+Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\shell\open"; ValueType: string; ValueName: "MultiSelectModel"; ValueData: "Player"
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\shell\open"; ValueType: string; ValueName: ""; ValueData: "Play"
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKeyMP3}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
-
-Root: HKCR; Subkey: "PlayIt-Launcher"; ValueType: string; ValueName: ""; ValueData: "PlayIt Launcher"; Flags: uninsdeletekey
-Root: HKCR; Subkey: "PlayIt-Launcher"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Flags: uninsdeletekey
-Root: HKCR; Subkey: "PlayIt-Launcher\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
