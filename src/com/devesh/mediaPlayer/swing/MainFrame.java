@@ -6,6 +6,7 @@ import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.devesh.mediaPlayer.listHelpers.SngListCellRenderer;
 import com.devesh.mediaPlayer.listHelpers.ListItemTransferHandler;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -18,6 +19,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -29,6 +32,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainFrame extends javax.swing.JFrame
 		implements SongPlayer.SongChangeListener {
@@ -37,8 +42,10 @@ public class MainFrame extends javax.swing.JFrame
 	private static SongPlayer player;
 	private boolean pbChange = false;
 	private final ImageIcon imgPlay, imgPause;
+	Logger logger;
 
 	public MainFrame() {
+		logger = LoggerFactory.getLogger(MainFrame.class);
 		playlist = new Playlist();
 		imgPlay = new javax.swing.ImageIcon(
 				getClass().getResource("/play.png"));
@@ -50,6 +57,7 @@ public class MainFrame extends javax.swing.JFrame
 
 
 	public MainFrame(Playlist playlist, SongPlayer player) {
+		logger = LoggerFactory.getLogger(MainFrame.class);
 		MainFrame.playlist = playlist;
 		MainFrame.player = player;
 		imgPlay = new javax.swing.ImageIcon(
@@ -91,6 +99,8 @@ public class MainFrame extends javax.swing.JFrame
         btnQuit = new javax.swing.JMenuItem();
         mItmEdit = new javax.swing.JMenu();
         btnAutostart = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        btnDownload = new javax.swing.JMenuItem();
 
         setTitle("PlayIt Music Player");
         setMinimumSize(new java.awt.Dimension(300, 250));
@@ -274,7 +284,6 @@ public class MainFrame extends javax.swing.JFrame
         btnOpn.setToolTipText("Open File");
         btnOpn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         btnOpn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnOpn.setIconTextGap(0);
         btnOpn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOpnActionPerformed(evt);
@@ -311,6 +320,8 @@ public class MainFrame extends javax.swing.JFrame
         mItmEdit.setText("Edit");
 
         btnAutostart.setText("Autostart");
+        btnAutostart.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        btnAutostart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnAutostart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAutostartActionPerformed(evt);
@@ -319,6 +330,21 @@ public class MainFrame extends javax.swing.JFrame
         mItmEdit.add(btnAutostart);
 
         menu.add(mItmEdit);
+
+        jMenu1.setText("Tools");
+
+        btnDownload.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        btnDownload.setText("Download Songs");
+        btnDownload.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        btnDownload.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnDownload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDownloadActionPerformed(evt);
+            }
+        });
+        jMenu1.add(btnDownload);
+
+        menu.add(jMenu1);
 
         setJMenuBar(menu);
 
@@ -593,6 +619,18 @@ public class MainFrame extends javax.swing.JFrame
 		setter.setVisible(true);
     }//GEN-LAST:event_btnAutostartActionPerformed
 
+    private void btnDownloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDownloadActionPerformed
+		try 
+		{
+			Desktop desktop = Desktop.getDesktop();
+			logger.info("redirecting to https://ytmdl.deepjyoti30.dev/search");
+			desktop.browse(new URI("https://ytmdl.deepjyoti30.dev/search"));
+		} catch (URISyntaxException | IOException ex) 
+		{
+			logger.error("Exception while redirecting", ex);
+		}
+    }//GEN-LAST:event_btnDownloadActionPerformed
+
 
 	public void save()
 	{
@@ -770,6 +808,7 @@ public class MainFrame extends javax.swing.JFrame
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btmPanel;
     private javax.swing.JMenuItem btnAutostart;
+    private javax.swing.JMenuItem btnDownload;
     private javax.swing.JButton btnNext;
     private javax.swing.JMenuItem btnOpn;
     private javax.swing.JPanel btnPanel;
@@ -779,6 +818,7 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JMenuItem btnSave;
     private javax.swing.JMenuItem btnShuffel;
     private javax.swing.JPanel ctrlPanel;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JMenu mItmEdit;
     private javax.swing.JMenu mItmFile;
