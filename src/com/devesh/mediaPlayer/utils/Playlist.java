@@ -8,13 +8,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.DefaultListModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Playlist implements Serializable {
-
+	
 	private final ArrayList<Song> list;
 	private final DefaultListModel<String> songs;
 	public int currentSong;
-
+	private final Logger logger = LoggerFactory.getLogger(Playlist.class);
+	
 	public Playlist() {
 		list = new ArrayList<>();
 		this.songs = new DefaultListModel<>();
@@ -82,8 +85,9 @@ public class Playlist implements Serializable {
 			{
 				songList.add(new Song(file));
 			} catch (InvalidDataException | IOException
-			  | UnsupportedTagException ex)
+					| UnsupportedTagException ex)
 			{
+				logger.error("exception while opening " + file.getName(), ex);
 			}
 		});
 

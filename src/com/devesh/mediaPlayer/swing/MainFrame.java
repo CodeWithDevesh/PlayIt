@@ -328,8 +328,9 @@ public class MainFrame extends javax.swing.JFrame
 
     private void btnOpnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpnActionPerformed
 		File[] files = Application.showOpenDialog();
-		if(files != null)
+		if(files != null){
 			openMedia(files);
+		}
     }//GEN-LAST:event_btnOpnActionPerformed
 
 
@@ -353,8 +354,7 @@ public class MainFrame extends javax.swing.JFrame
 			}
 		} else
 		{
-			playlist.addSongs(new ArrayList<>(
-					Arrays.asList(files)));
+			playlist.addSongs(new ArrayList<>(Arrays.asList(files)));
 			if (player.status == SongPlayer.STOPED)
 			{
 				play();
