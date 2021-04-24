@@ -15,8 +15,8 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 
 public class Song implements Serializable {
 
-	private File file;
-	private String title;
+	private final File file;
+	private String title = null;
 	private final int length;
 	private FFmpeg ffmpeg = Application.ffmpeg;
 	private FFprobe ffprobe = Application.ffprobe;
@@ -34,12 +34,14 @@ public class Song implements Serializable {
 		FFmpegProbeResult result = ffprobe.probe(file.getPath());
 		FFmpegFormat format = result.getFormat();
 		length = (int) format.duration * 1000;
-		title = format.tags.get("title");
+		if (format.tags != null)
+			title = format.tags.get("title");
 		if (title == null)
 		{
 			title = file.getName();
-			if (title.endsWith(".mp3"))
-				title = title.substring(0, title.length() - 4);
+			if (title.endsWith(format.format_name))
+				title = title.substring(0,
+						title.length() - (format.format_name.length() + 1));
 		}
 
 		if (!"mp3".equals(format.format_name))
@@ -55,16 +57,15 @@ public class Song implements Serializable {
 				fileChooser.setMultiSelectionEnabled(false);
 				fileChooser.setCurrentDirectory(Application.currentDir);
 				int y = fileChooser.showSaveDialog(null);
+				Application.updateCurrentDir(
+						fileChooser.getCurrentDirectory());
 				if (y == JFileChooser.APPROVE_OPTION)
 				{
 					String out = fileChooser.getSelectedFile().getPath()
 							+ "\\" + title + ".mp3";
-					Application.updateCurrentDir(
-							fileChooser.getCurrentDirectory());
-					if (!SngConverter.autoConvert(result, out))
-						throw new InvalidDataException();
-					else
-						this.file = new File(out);
+					SngConverter.autoConvert(result, out,
+							Application.CONVERSION_LISTENER);
+					throw new InvalidDataException();
 				} else
 					throw new InvalidDataException();
 			} else
@@ -73,6 +74,7 @@ public class Song implements Serializable {
 			}
 		}
 	}
+
 
 	public File getFile()
 	{

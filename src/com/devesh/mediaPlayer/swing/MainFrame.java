@@ -2,6 +2,7 @@ package com.devesh.mediaPlayer.swing;
 
 import com.devesh.mediaPlayer.Application;
 import com.devesh.mediaPlayer.autostart.AutostartSetter;
+import com.devesh.mediaPlayer.converter.ConverterFrame;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.devesh.mediaPlayer.listHelpers.SngListCellRenderer;
@@ -271,8 +272,8 @@ public class MainFrame extends javax.swing.JFrame
         btnSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnSave.setText("Save Playlist");
         btnSave.setToolTipText("Save the playlist to a file");
-        btnSave.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        btnSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnSave.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnSave.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -283,8 +284,8 @@ public class MainFrame extends javax.swing.JFrame
         btnOpn.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnOpn.setText("Open");
         btnOpn.setToolTipText("Open File");
-        btnOpn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        btnOpn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnOpn.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnOpn.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnOpn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOpnActionPerformed(evt);
@@ -295,8 +296,8 @@ public class MainFrame extends javax.swing.JFrame
         btnShuffel.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnShuffel.setText("Shuffel");
         btnShuffel.setToolTipText("Reorder the playlist");
-        btnShuffel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        btnShuffel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnShuffel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnShuffel.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnShuffel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnShuffelActionPerformed(evt);
@@ -307,8 +308,8 @@ public class MainFrame extends javax.swing.JFrame
         btnQuit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnQuit.setText("Quit");
         btnQuit.setToolTipText("Quit the player");
-        btnQuit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        btnQuit.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnQuit.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnQuit.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnQuit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnQuitActionPerformed(evt);
@@ -321,8 +322,8 @@ public class MainFrame extends javax.swing.JFrame
         menEdit.setText("Edit");
 
         btnAutostart.setText("Autostart");
-        btnAutostart.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        btnAutostart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnAutostart.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnAutostart.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnAutostart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAutostartActionPerformed(evt);
@@ -336,8 +337,8 @@ public class MainFrame extends javax.swing.JFrame
 
         btnDownload.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnDownload.setText("Download Songs");
-        btnDownload.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        btnDownload.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnDownload.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnDownload.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnDownload.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDownloadActionPerformed(evt);
@@ -346,6 +347,8 @@ public class MainFrame extends javax.swing.JFrame
         menTools.add(btnDownload);
 
         btnConverter.setText("Converter");
+        btnConverter.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnConverter.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnConverter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConverterActionPerformed(evt);
@@ -390,13 +393,16 @@ public class MainFrame extends javax.swing.JFrame
 		} else
 		{
 			playlist.addSongs(new ArrayList<>(Arrays.asList(files)));
-			if (player.status == SongPlayer.STOPED)
+			if (playlist.size() > 0)
 			{
-				play();
-				sngTitle.setText(playlist.getCurrentSong().getTitle());
-			} else if (player.status == SongPlayer.PAUSED)
-			{
-				player.play(sngList.getModel().getSize() - 1);
+				if (player.status == SongPlayer.STOPED)
+				{
+					play();
+					sngTitle.setText(playlist.getCurrentSong().getTitle());
+				} else if (player.status == SongPlayer.PAUSED)
+				{
+					player.play(sngList.getModel().getSize() - 1);
+				}
 			}
 		}
 		updatePlayIcon();
@@ -641,7 +647,7 @@ public class MainFrame extends javax.swing.JFrame
     }//GEN-LAST:event_btnDownloadActionPerformed
 
     private void btnConverterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConverterActionPerformed
-		
+		new ConverterFrame().setVisible(true);
     }//GEN-LAST:event_btnConverterActionPerformed
 
 

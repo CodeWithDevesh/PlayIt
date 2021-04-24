@@ -1,6 +1,7 @@
 package com.devesh.mediaPlayer;
 
 import com.devesh.mediaPlayer.RMI.OpenRMI;
+import com.devesh.mediaPlayer.converter.ConversionListener;
 import com.devesh.mediaPlayer.httpServer.Server;
 import com.devesh.mediaPlayer.swing.MainFrame;
 import com.devesh.mediaPlayer.swing.Tray;
@@ -150,8 +151,6 @@ public class Application implements OpenRMI {
 
 	public static File[] showOpenDialog()
 	{
-		metaDir.mkdirs();
-
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setMultiSelectionEnabled(true);
@@ -161,9 +160,9 @@ public class Application implements OpenRMI {
 		// fileChooser.getAcceptAllFileFilter());
 		fileChooser.setCurrentDirectory(currentDir);
 		int i = fileChooser.showOpenDialog(null);
-		
+
 		updateCurrentDir(fileChooser.getCurrentDirectory());
-		
+
 		if (i == JFileChooser.APPROVE_OPTION)
 			return fileChooser.getSelectedFiles();
 		return null;
@@ -172,6 +171,7 @@ public class Application implements OpenRMI {
 
 	private static void initCurrnetDir()
 	{
+		metaDir.mkdirs();
 		File lastLoc = new File(metaDir.getPath() + "\\lastLoc.dat");
 		if (lastLoc.exists())
 		{
@@ -267,4 +267,17 @@ public class Application implements OpenRMI {
 		frame.setPlaylist(playlist);
 		player.play();
 	}
+
+	public static final ConversionListener CONVERSION_LISTENER = new ConversionListener() {
+		@Override
+		public void stoped(boolean completed, File file)
+		{
+			if (completed == true && file != null)
+			{
+				File[] files = new File[1];
+				files[0] = file;
+				frame.openMedia(files);
+			}
+		}
+	};
 }
