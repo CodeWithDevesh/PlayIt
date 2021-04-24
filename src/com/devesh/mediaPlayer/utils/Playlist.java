@@ -1,7 +1,6 @@
 package com.devesh.mediaPlayer.utils;
 
 import com.mpatric.mp3agic.InvalidDataException;
-import com.mpatric.mp3agic.UnsupportedTagException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,8 +30,7 @@ public class Playlist implements Serializable {
 			try
 			{
 				songList.add(new Song(file));
-			} catch (InvalidDataException | IOException
-					| UnsupportedTagException ex)
+			} catch (InvalidDataException | IOException ex)
 			{
 			}
 		});
@@ -84,8 +82,7 @@ public class Playlist implements Serializable {
 			try
 			{
 				songList.add(new Song(file));
-			} catch (InvalidDataException | IOException
-					| UnsupportedTagException ex)
+			} catch (InvalidDataException | IOException ex)
 			{
 				logger.error("exception while opening " + file.getName(), ex);
 			}

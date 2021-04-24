@@ -92,15 +92,16 @@ public class MainFrame extends javax.swing.JFrame
         spPanel = new javax.swing.JPanel();
         sngList = new javax.swing.JList<>();
         menu = new javax.swing.JMenuBar();
-        mItmFile = new javax.swing.JMenu();
+        menFile = new javax.swing.JMenu();
         btnSave = new javax.swing.JMenuItem();
         btnOpn = new javax.swing.JMenuItem();
         btnShuffel = new javax.swing.JMenuItem();
         btnQuit = new javax.swing.JMenuItem();
-        mItmEdit = new javax.swing.JMenu();
+        menEdit = new javax.swing.JMenu();
         btnAutostart = new javax.swing.JMenuItem();
-        jMenu1 = new javax.swing.JMenu();
+        menTools = new javax.swing.JMenu();
         btnDownload = new javax.swing.JMenuItem();
+        btnConverter = new javax.swing.JMenuItem();
 
         setTitle("PlayIt Music Player");
         setMinimumSize(new java.awt.Dimension(300, 250));
@@ -264,8 +265,8 @@ public class MainFrame extends javax.swing.JFrame
 
         menu.setFocusable(false);
 
-        mItmFile.setText("File");
-        mItmFile.setFocusable(false);
+        menFile.setText("File");
+        menFile.setFocusable(false);
 
         btnSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnSave.setText("Save Playlist");
@@ -277,7 +278,7 @@ public class MainFrame extends javax.swing.JFrame
                 btnSaveActionPerformed(evt);
             }
         });
-        mItmFile.add(btnSave);
+        menFile.add(btnSave);
 
         btnOpn.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnOpn.setText("Open");
@@ -289,7 +290,7 @@ public class MainFrame extends javax.swing.JFrame
                 btnOpnActionPerformed(evt);
             }
         });
-        mItmFile.add(btnOpn);
+        menFile.add(btnOpn);
 
         btnShuffel.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnShuffel.setText("Shuffel");
@@ -301,7 +302,7 @@ public class MainFrame extends javax.swing.JFrame
                 btnShuffelActionPerformed(evt);
             }
         });
-        mItmFile.add(btnShuffel);
+        menFile.add(btnShuffel);
 
         btnQuit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnQuit.setText("Quit");
@@ -313,11 +314,11 @@ public class MainFrame extends javax.swing.JFrame
                 btnQuitActionPerformed(evt);
             }
         });
-        mItmFile.add(btnQuit);
+        menFile.add(btnQuit);
 
-        menu.add(mItmFile);
+        menu.add(menFile);
 
-        mItmEdit.setText("Edit");
+        menEdit.setText("Edit");
 
         btnAutostart.setText("Autostart");
         btnAutostart.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -327,11 +328,11 @@ public class MainFrame extends javax.swing.JFrame
                 btnAutostartActionPerformed(evt);
             }
         });
-        mItmEdit.add(btnAutostart);
+        menEdit.add(btnAutostart);
 
-        menu.add(mItmEdit);
+        menu.add(menEdit);
 
-        jMenu1.setText("Tools");
+        menTools.setText("Tools");
 
         btnDownload.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         btnDownload.setText("Download Songs");
@@ -342,9 +343,17 @@ public class MainFrame extends javax.swing.JFrame
                 btnDownloadActionPerformed(evt);
             }
         });
-        jMenu1.add(btnDownload);
+        menTools.add(btnDownload);
 
-        menu.add(jMenu1);
+        btnConverter.setText("Converter");
+        btnConverter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConverterActionPerformed(evt);
+            }
+        });
+        menTools.add(btnConverter);
+
+        menu.add(menTools);
 
         setJMenuBar(menu);
 
@@ -631,6 +640,10 @@ public class MainFrame extends javax.swing.JFrame
 		}
     }//GEN-LAST:event_btnDownloadActionPerformed
 
+    private void btnConverterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConverterActionPerformed
+		
+    }//GEN-LAST:event_btnConverterActionPerformed
+
 
 	public void save()
 	{
@@ -808,6 +821,7 @@ public class MainFrame extends javax.swing.JFrame
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btmPanel;
     private javax.swing.JMenuItem btnAutostart;
+    private javax.swing.JMenuItem btnConverter;
     private javax.swing.JMenuItem btnDownload;
     private javax.swing.JButton btnNext;
     private javax.swing.JMenuItem btnOpn;
@@ -818,10 +832,10 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JMenuItem btnSave;
     private javax.swing.JMenuItem btnShuffel;
     private javax.swing.JPanel ctrlPanel;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JScrollPane jScrollPane;
-    private javax.swing.JMenu mItmEdit;
-    private javax.swing.JMenu mItmFile;
+    private javax.swing.JMenu menEdit;
+    private javax.swing.JMenu menFile;
+    private javax.swing.JMenu menTools;
     private javax.swing.JMenuBar menu;
     public static javax.swing.JSlider progressBar;
     private javax.swing.JSlider sldVolume;

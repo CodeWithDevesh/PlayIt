@@ -4,7 +4,6 @@ import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.Song;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.mpatric.mp3agic.InvalidDataException;
-import com.mpatric.mp3agic.UnsupportedTagException;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -105,7 +104,7 @@ public class ListItemTransferHandler extends TransferHandler {
 					song = new Song(files.get(i));
 					playlist.addSong(song, loc.getIndex() + i);
 				}
-			} catch (InvalidDataException | UnsupportedTagException ex)
+			} catch (InvalidDataException ex)
 			{
 				return false;
 			}

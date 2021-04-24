@@ -20,10 +20,13 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
+import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import net.bramp.ffmpeg.FFmpeg;
+import net.bramp.ffmpeg.FFprobe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +40,12 @@ public class Application implements OpenRMI {
 	private static final Application app = new Application();
 	public static final File metaDir = new File(
 			System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
+	public static File currentDir;
+	public static FFmpeg ffmpeg;
+	public static FFprobe ffprobe;
 
 	private static final int RMIPort = 2023, httpPort = 2021;
-	private static Logger logger;
+	public static Logger logger;
 
 	public static void main(String[] args)
 	{
@@ -55,6 +61,17 @@ public class Application implements OpenRMI {
 		new Server(httpPort);
 
 		logger = LoggerFactory.getLogger(Application.class);
+		initCurrnetDir();
+
+		try
+		{
+			ffmpeg = new FFmpeg("ffmpeg.exe");
+			ffprobe = new FFprobe("ffprobe.exe");
+		} catch (IOException ex)
+		{
+			java.util.logging.Logger.getLogger(Application.class.getName())
+					.log(Level.SEVERE, null, ex);
+		}
 
 		try
 		{
@@ -135,31 +152,48 @@ public class Application implements OpenRMI {
 	{
 		metaDir.mkdirs();
 
-		File lastLoc = new File(metaDir.getPath() + "\\lastLoc.dat");
-
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setMultiSelectionEnabled(true);
 		fileChooser.setFileFilter(
 				new FileNameExtensionFilter("Music Files", "mp3", "ppl"));
-		fileChooser.removeChoosableFileFilter(
-				fileChooser.getAcceptAllFileFilter());
+		// fileChooser.removeChoosableFileFilter(
+		// fileChooser.getAcceptAllFileFilter());
+		fileChooser.setCurrentDirectory(currentDir);
+		int i = fileChooser.showOpenDialog(null);
+		
+		updateCurrentDir(fileChooser.getCurrentDirectory());
+		
+		if (i == JFileChooser.APPROVE_OPTION)
+			return fileChooser.getSelectedFiles();
+		return null;
+	}
 
+
+	private static void initCurrnetDir()
+	{
+		File lastLoc = new File(metaDir.getPath() + "\\lastLoc.dat");
 		if (lastLoc.exists())
 		{
 			try
 			{
-				Scanner scanner = new Scanner(lastLoc);
-				File file = new File(scanner.nextLine());
-				if (file.exists())
-					fileChooser.setCurrentDirectory(file);
+				try (Scanner scanner = new Scanner(lastLoc))
+				{
+					File file = new File(scanner.nextLine());
+					if (file.exists())
+						currentDir = file;
+				}
 			} catch (FileNotFoundException ex)
 			{
 				logger.error(null, ex);
 			}
 		}
+	}
 
-		int i = fileChooser.showOpenDialog(null);
+
+	public static void updateCurrentDir(File file)
+	{
+		File lastLoc = new File(metaDir.getPath() + "\\lastLoc.dat");
 
 		if (lastLoc.exists())
 			lastLoc.delete();
@@ -169,16 +203,14 @@ public class Application implements OpenRMI {
 			try (BufferedWriter bw = new BufferedWriter(
 					new FileWriter(lastLoc)))
 			{
-				bw.write(fileChooser.getCurrentDirectory().getPath());
+				bw.write(file.getPath());
+				currentDir = file;
 				bw.close();
 			}
 		} catch (IOException ex)
 		{
 			logger.error(null, ex);
 		}
-		if (i == JFileChooser.APPROVE_OPTION)
-			return fileChooser.getSelectedFiles();
-		return null;
 	}
 
 
