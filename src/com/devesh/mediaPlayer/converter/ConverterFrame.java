@@ -39,7 +39,7 @@ public class ConverterFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("PlayIt Converter");
-        setMinimumSize(new java.awt.Dimension(500, 300));
+        setMinimumSize(new java.awt.Dimension(550, 300));
 
         pnlMain.setName(""); // NOI18N
         pnlMain.setLayout(new java.awt.GridBagLayout());
@@ -187,7 +187,7 @@ public class ConverterFrame extends javax.swing.JFrame {
 
         getContentPane().add(pnlSouth, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(500, 300));
+        setSize(new java.awt.Dimension(550, 300));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 

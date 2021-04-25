@@ -41,7 +41,7 @@ public class MainFrame extends javax.swing.JFrame
 
 	private static Playlist playlist;
 	private static SongPlayer player;
-	private boolean pbChange = false;
+	public static boolean pbChange = false;
 	private final ImageIcon imgPlay, imgPause;
 	Logger logger;
 
@@ -176,11 +176,6 @@ public class MainFrame extends javax.swing.JFrame
         progressBar.setBorder(null);
         progressBar.setDoubleBuffered(true);
         progressBar.setFocusable(false);
-        progressBar.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                progressBarStateChanged(evt);
-            }
-        });
         progressBar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 progressBarMousePressed(evt);
@@ -441,9 +436,6 @@ public class MainFrame extends javax.swing.JFrame
 		player.setVoulume(sldVolume.getValue()/100f);
     }//GEN-LAST:event_sldVolumeStateChanged
 
-    private void progressBarStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_progressBarStateChanged
-    }//GEN-LAST:event_progressBarStateChanged
-
     private void sngListKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sngListKeyPressed
 		if((evt.getKeyCode() == KeyEvent.VK_ENTER || evt.getKeyCode() == KeyEvent.VK_NUMPAD5) 
 				&& sngList.hasFocus()){
@@ -459,6 +451,11 @@ public class MainFrame extends javax.swing.JFrame
     }//GEN-LAST:event_progressBarMousePressed
 
     private void progressBarMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_progressBarMouseReleased
+		if(pbChange)
+		{
+			player.setProgress(progressBar.getValue());
+		}
+		
 		pbChange = false;
     }//GEN-LAST:event_progressBarMouseReleased
 

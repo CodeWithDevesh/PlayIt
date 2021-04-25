@@ -18,8 +18,8 @@ public class Song implements Serializable {
 	private final File file;
 	private String title = null;
 	private final int length;
-	private FFmpeg ffmpeg = Application.ffmpeg;
-	private FFprobe ffprobe = Application.ffprobe;
+	private transient FFmpeg ffmpeg = Application.ffmpeg;
+	private transient FFprobe ffprobe = Application.ffprobe;
 
 	public Song(File file)
 			throws InvalidDataException, IOException {

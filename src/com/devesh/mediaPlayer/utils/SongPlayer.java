@@ -4,6 +4,8 @@ import com.devesh.mediaPlayer.swing.MainFrame;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
@@ -25,7 +27,9 @@ public final class SongPlayer {
 	private Thread playbackThread;
 	private final Object lock;
 	private boolean songChanging = false;
-	private float currentVol = 1f;
+	private float currentVol = 0f;
+	private int framesSkipped = 0;
+	private boolean updatingProgress = false;
 
 	ArrayList<SongChangeListener> songChangeListeners;
 
@@ -97,7 +101,12 @@ public final class SongPlayer {
 	 */
 	private void playInternal()
 	{
+		framesSkipped = 0;
 		playbackThread = new Thread(() -> {
+			while (updatingProgress)
+			{
+				System.out.print("");
+			}
 			while (status != STOPED)
 			{
 				try
@@ -124,7 +133,8 @@ public final class SongPlayer {
 						}
 					}
 				}
-				MainFrame.progressBar.setValue(getProgress());
+				if (!MainFrame.pbChange)
+					MainFrame.progressBar.setValue(getProgressPercentage());
 			}
 			player.close();
 			status = STOPED;
@@ -133,7 +143,6 @@ public final class SongPlayer {
 					next();
 				});
 		});
-		playbackThread.setDaemon(true);
 		playbackThread.setPriority(Thread.MAX_PRIORITY);
 		playbackThread.start();
 	}
@@ -237,9 +246,9 @@ public final class SongPlayer {
 	 */
 	public void setVoulume(float volume)
 	{
-		currentVol = (float) ((volume*31) - 30);		
+		currentVol = (float) ((volume * 30) - 30);
 		System.out.println(currentVol);
-		if(volume == 0)
+		if (volume == 0)
 			currentVol = -80f;
 	}
 
@@ -249,12 +258,45 @@ public final class SongPlayer {
 	 * 
 	 * @return a int between 0 and 100
 	 */
-	public int getProgress()
+	public int getProgressPercentage()
 	{
-		float a = player.getPosition();
+		float a = player.getPosition() + framesSkipped;
 		float b = playlist.getCurrentSong().getLength();
 		float i = (a / b) * 100;
 		return (int) i;
+	}
+
+
+	/**
+	 * set the progress in percentage
+	 * 
+	 * @param progress
+	 *                     it should be between 0 and 100
+	 */
+	public void setProgress(int progress)
+	{
+		if (progress < 0 || progress > 100)
+			return;
+
+		if (status != STOPED)
+		{
+			stop();
+			updatingProgress = true;
+			try
+			{
+				play();
+				float percentage = ((float) progress) / 100f;
+				int toSkip = (int) (percentage
+						* ((float) playlist.getCurrentSong().getLength()));
+				framesSkipped = toSkip;
+				player.skipMilliSeconds(toSkip);
+			} catch (JavaLayerException ex)
+			{
+				Logger.getLogger(SongPlayer.class.getName()).log(Level.SEVERE,
+						null, ex);
+			}
+			updatingProgress = false;
+		}
 	}
 
 
