@@ -16,13 +16,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -371,19 +367,17 @@ public class MainFrame extends javax.swing.JFrame
 				{
 					try
 					{
-						try (ObjectInputStream oi = new ObjectInputStream(
-								new FileInputStream(file)))
+						Scanner scanner = new Scanner(file);
+						while (scanner.hasNext())
 						{
-							Application.setPlaylist(
-									(Playlist) oi.readObject());
-							playlist.addListener(playListListener);
+							playlist.addSong(
+									new Song(
+											new File(scanner.nextLine().replace(
+													"\n", ""))));
 						}
-					} catch (IOException | ClassNotFoundException ex)
+					} catch (InvalidDataException | IOException ex)
 					{
-						logger.error(
-								"Error while opening playlist:"
-										+ file.getPath(),
-								ex);
+						logger.error("Error while opening playlist", ex);
 					}
 				} else
 				{
@@ -689,11 +683,14 @@ public class MainFrame extends javax.swing.JFrame
 			try
 			{
 				file.createNewFile();
-				try (ObjectOutputStream os = new ObjectOutputStream(
-						new FileOutputStream(file)))
+				try (BufferedWriter writer = new BufferedWriter(
+						new FileWriter(file)))
 				{
-					os.writeObject(playlist);
-					os.close();
+					for(Song song : playlist.getPlayList())
+					{
+						writer.append(song.getFile().getPath());
+						writer.newLine();
+					}
 				}
 			} catch (IOException ex)
 			{

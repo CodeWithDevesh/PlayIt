@@ -1,5 +1,6 @@
 package com.devesh.mediaPlayer.listHelpers;
 
+import static com.devesh.mediaPlayer.Application.logger;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.Song;
 import com.devesh.mediaPlayer.utils.SongPlayer;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
@@ -100,16 +102,40 @@ public class ListItemTransferHandler extends TransferHandler {
 				int i = 0;
 				for(File file : files)
 				{
-					try
+					String filename = file.getPath();
+					if (filename.endsWith(".ppl"))
 					{
-						Song song = new Song(file);
-						playlist.addSong(song, loc.getIndex() + i);
-						i++;
-					} catch (InvalidDataException | IOException ex)
+						try
+						{
+							Scanner scanner = new Scanner(file);
+							while (scanner.hasNext())
+							{
+								playlist.addSong(
+										new Song(
+												new File(scanner.nextLine()
+														.replace(
+																"\n", ""))),
+										loc.getIndex() + i);
+								i++;
+							}
+						} catch (InvalidDataException | IOException ex)
+						{
+							logger.error("Error while opening playlist", ex);
+						}
+					} else
 					{
-						Logger.getLogger(
-						  ListItemTransferHandler.class.getName())
-						  .log(Level.SEVERE, null, ex);
+						try
+						{
+							playlist.addSong(new Song(file),
+									loc.getIndex() + i);
+							i++;
+						} catch (InvalidDataException | IOException ex)
+						{
+							logger.error(
+									"Error while opening file: "
+											+ file.getPath(),
+									ex);
+						}
 					}
 				}
 			});
