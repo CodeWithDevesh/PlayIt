@@ -1,6 +1,5 @@
 package com.devesh.mediaPlayer.utils;
 
-import com.devesh.mediaPlayer.swing.MainFrame;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -133,8 +132,6 @@ public final class SongPlayer {
 						}
 					}
 				}
-				if (!MainFrame.pbChange)
-					MainFrame.progressBar.setValue(getProgressPercentage());
 			}
 			player.close();
 			status = STOPED;
@@ -260,10 +257,14 @@ public final class SongPlayer {
 	 */
 	public int getProgressPercentage()
 	{
-		float a = player.getPosition() + framesSkipped;
-		float b = playlist.getCurrentSong().getLength();
-		float i = (a / b) * 100;
-		return (int) i;
+		if (player != null && playlist.getCurrentSong() != null)
+		{
+			float a = player.getPosition() + framesSkipped;
+			float b = playlist.getCurrentSong().getLength();
+			float i = (a / b) * 100;
+			return (int) i;
+		}
+		return 0;
 	}
 
 

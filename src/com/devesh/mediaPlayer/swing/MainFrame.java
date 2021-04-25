@@ -28,6 +28,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +38,10 @@ public class MainFrame extends javax.swing.JFrame
 
 	private static Playlist playlist;
 	private static SongPlayer player;
-	public static boolean pbChange = false;
+	private boolean pbChange = false;
 	private final ImageIcon imgPlay, imgPause;
 	Logger logger;
+	Timer secTimer;
 
 	public MainFrame() {
 		logger = LoggerFactory.getLogger(MainFrame.class);
@@ -52,6 +54,10 @@ public class MainFrame extends javax.swing.JFrame
 		initComponents();
 
 		playlist.addListener(playListListener);
+		
+		new Timer(1000, (ActionEvent e) -> {
+			everySecond();
+		}).setRepeats(true);
 	}
 
 
@@ -66,6 +72,12 @@ public class MainFrame extends javax.swing.JFrame
 		initComponents();
 
 		playlist.addListener(playListListener);
+		
+		secTimer = new Timer(1000, (ActionEvent e) -> {
+			everySecond();
+		});
+		secTimer.setRepeats(true);
+		secTimer.start();
 	}
 
 
@@ -776,19 +788,31 @@ public class MainFrame extends javax.swing.JFrame
 	@Override
 	public void songChanged()
 	{
-		sngTitle.setText(playlist.getCurrentSong().getTitle());
 		sngList.repaint();
 		updatePlayIcon();
+	}
+	
+	private void everySecond(){
+		if(!pbChange && player != null)
+			progressBar.setValue(player.getProgressPercentage());
 	}
 
 
 	private void updatePlayIcon()
 	{
-
 		switch (player.status) {
-		case SongPlayer.STOPED -> btnPlay.setIcon(imgPlay);
-		case SongPlayer.PAUSED -> btnPlay.setIcon(imgPlay);
-		case SongPlayer.PLAYING -> btnPlay.setIcon(imgPause);
+		case SongPlayer.STOPED -> {
+			btnPlay.setIcon(imgPlay);
+			sngTitle.setText("No Song Playing");
+		}
+		case SongPlayer.PAUSED -> {
+			btnPlay.setIcon(imgPlay);
+			sngTitle.setText(playlist.getCurrentSong().getTitle());
+		}
+		case SongPlayer.PLAYING -> {
+			btnPlay.setIcon(imgPause);
+			sngTitle.setText(playlist.getCurrentSong().getTitle());
+		}
 		default -> {
 		}
 		}
@@ -841,7 +865,7 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JMenu menFile;
     private javax.swing.JMenu menTools;
     private javax.swing.JMenuBar menu;
-    public static javax.swing.JSlider progressBar;
+    private javax.swing.JSlider progressBar;
     private javax.swing.JSlider sldVolume;
     private javax.swing.JList<String> sngList;
     private javax.swing.JLabel sngTitle;
