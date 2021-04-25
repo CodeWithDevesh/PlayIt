@@ -4,13 +4,6 @@ import com.devesh.mediaPlayer.swing.MainFrame;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.Line.Info;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.Port;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
@@ -32,6 +25,7 @@ public final class SongPlayer {
 	private Thread playbackThread;
 	private final Object lock;
 	private boolean songChanging = false;
+	private float currentVol = 1f;
 
 	ArrayList<SongChangeListener> songChangeListeners;
 
@@ -108,6 +102,7 @@ public final class SongPlayer {
 			{
 				try
 				{
+					player.setVolume(currentVol);
 					if (!player.play(1))
 					{
 						break;
@@ -242,55 +237,10 @@ public final class SongPlayer {
 	 */
 	public void setVoulume(float volume)
 	{
-		Info source = Port.Info.SPEAKER;
-		Info source2 = Port.Info.HEADPHONE;
-		Info source3 = Port.Info.LINE_OUT;
-
-		if (AudioSystem.isLineSupported(source))
-		{
-			try
-			{
-				Port outline = (Port) AudioSystem.getLine(source);
-				outline.open();
-				FloatControl volumeControl = (FloatControl) outline
-						.getControl(FloatControl.Type.VOLUME);
-				volumeControl.setValue(volume);
-			} catch (LineUnavailableException ex)
-			{
-				Logger.getLogger(SongPlayer.class.getName()).log(Level.SEVERE,
-						null, ex);
-			}
-		}
-		if (AudioSystem.isLineSupported(source2))
-		{
-			try
-			{
-				Port outline = (Port) AudioSystem.getLine(source2);
-				outline.open();
-				FloatControl volumeControl = (FloatControl) outline
-						.getControl(FloatControl.Type.VOLUME);
-				volumeControl.setValue(volume);
-			} catch (LineUnavailableException ex)
-			{
-				Logger.getLogger(SongPlayer.class.getName()).log(Level.SEVERE,
-						null, ex);
-			}
-		}
-		if (AudioSystem.isLineSupported(source3))
-		{
-			try
-			{
-				Port outline = (Port) AudioSystem.getLine(source3);
-				outline.open();
-				FloatControl volumeControl = (FloatControl) outline
-						.getControl(FloatControl.Type.VOLUME);
-				volumeControl.setValue(volume);
-			} catch (LineUnavailableException ex)
-			{
-				Logger.getLogger(SongPlayer.class.getName()).log(Level.SEVERE,
-						null, ex);
-			}
-		}
+		currentVol = (float) ((volume*31) - 30);		
+		System.out.println(currentVol);
+		if(volume == 0)
+			currentVol = -80f;
 	}
 
 
@@ -330,8 +280,9 @@ public final class SongPlayer {
 		 */
 		public void songChanged();
 	}
-	
-	public void changePlaylist(Playlist playlist){
+
+	public void changePlaylist(Playlist playlist)
+	{
 		this.playlist = playlist;
 	}
 }
