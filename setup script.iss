@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "PlayIt"
-#define MyAppVersion "0.3"
+#define MyAppVersion "1.0"
 #define MyAppExeName "PlayIt.exe"
 #define MyAppAssocName MyAppName + " Playlist"
 #define MyAppAssocExt ".ppl"
@@ -23,7 +23,7 @@ AllowNoIcons=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=Installers
-OutputBaseFilename=PlayIt-0.3
+OutputBaseFilename=PlayIt-1.0
 SetupIconFile=icon.ico
 Compression=lzma
 SolidCompression=yes

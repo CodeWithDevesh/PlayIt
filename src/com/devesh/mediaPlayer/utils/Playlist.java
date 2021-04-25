@@ -15,6 +15,7 @@ public class Playlist implements Serializable {
 	private final ArrayList<Song> list;
 	private final DefaultListModel<String> songs;
 	public int currentSong;
+	private transient ArrayList<PlayListListener> listeners = new ArrayList<>();
 	private final Logger logger = LoggerFactory.getLogger(Playlist.class);
 	
 	public Playlist() {
@@ -62,6 +63,9 @@ public class Playlist implements Serializable {
 	{
 		list.add(song);
 		songs.addElement(song.getTitle());
+		listeners.forEach(listener -> {
+			listener.sngAdded(size()-1);
+		});
 	}
 
 
@@ -71,6 +75,9 @@ public class Playlist implements Serializable {
 			currentSong++;
 		list.add(index, song);
 		songs.add(index, song.getTitle());
+		listeners.forEach(listener -> {
+			listener.sngAdded(index);
+		});
 	}
 
 
@@ -93,8 +100,11 @@ public class Playlist implements Serializable {
 		songList.forEach(song -> {
 			this.songs.addElement(song.getTitle());
 		});
+		listeners.forEach(listener -> {
+			listener.sngAdded(size()-1);
+		});
 	}
-
+	
 
 	public Song getSong(int index)
 	{
@@ -200,5 +210,11 @@ public class Playlist implements Serializable {
 	public int size()
 	{
 		return list.size();
+	}
+	
+	public void addListener(PlayListListener listener){
+		if(listeners == null)
+			listeners = new ArrayList<>();
+		listeners.add(listener);
 	}
 }

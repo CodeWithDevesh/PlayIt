@@ -7,6 +7,9 @@ import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.devesh.mediaPlayer.listHelpers.SngListCellRenderer;
 import com.devesh.mediaPlayer.listHelpers.ListItemTransferHandler;
+import com.devesh.mediaPlayer.utils.PlayListListener;
+import com.devesh.mediaPlayer.utils.Song;
+import com.mpatric.mp3agic.InvalidDataException;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -22,7 +25,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 import javax.swing.ImageIcon;
@@ -30,8 +32,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +54,8 @@ public class MainFrame extends javax.swing.JFrame
 				getClass().getResource("/pause.png"));
 		player = new SongPlayer(playlist);
 		initComponents();
+
+		playlist.addListener(playListListener);
 	}
 
 
@@ -66,6 +68,8 @@ public class MainFrame extends javax.swing.JFrame
 		imgPause = new javax.swing.ImageIcon(
 				getClass().getResource("/pause.png"));
 		initComponents();
+
+		playlist.addListener(playListListener);
 	}
 
 
@@ -247,16 +251,6 @@ public class MainFrame extends javax.swing.JFrame
             }
         });
         sngList.setTransferHandler(new ListItemTransferHandler(playlist, player));
-
-        sngList.getModel().addListDataListener(new ListDataListener(){
-            public void contentsChanged(ListDataEvent e) {
-            }
-            public void intervalAdded(ListDataEvent e) {
-                songAdded();
-            }
-            public void intervalRemoved(ListDataEvent e) {
-            }
-        });
         spPanel.add(sngList, java.awt.BorderLayout.CENTER);
 
         jScrollPane.setViewportView(spPanel);
@@ -374,38 +368,44 @@ public class MainFrame extends javax.swing.JFrame
 
 	public void openMedia(File[] files)
 	{
-		File file = files[0];
-		String filename = file.getPath();
-
-		if (filename.endsWith(".ppl"))
-		{
-			try
+		Thread openThread = new Thread(() -> {
+			for(File file : files)
 			{
-				try (ObjectInputStream oi = new ObjectInputStream(
-						new FileInputStream(file)))
+				String filename = file.getPath();
+				if (filename.endsWith(".ppl"))
 				{
-					Application.setPlaylist((Playlist) oi.readObject());
+					try
+					{
+						try (ObjectInputStream oi = new ObjectInputStream(
+								new FileInputStream(file)))
+						{
+							Application.setPlaylist(
+									(Playlist) oi.readObject());
+							playlist.addListener(playListListener);
+						}
+					} catch (IOException | ClassNotFoundException ex)
+					{
+						logger.error(
+								"Error while opening playlist:"
+										+ file.getPath(),
+								ex);
+					}
+				} else
+				{
+					try
+					{
+						playlist.addSong(new Song(file));
+					} catch (InvalidDataException | IOException ex)
+					{
+						logger.error(
+								"Error while opening file: " + file.getPath(),
+								ex);
+					}
 				}
-			} catch (IOException | ClassNotFoundException ex)
-			{
-
 			}
-		} else
-		{
-			playlist.addSongs(new ArrayList<>(Arrays.asList(files)));
-			if (playlist.size() > 0)
-			{
-				if (player.status == SongPlayer.STOPED)
-				{
-					play();
-					sngTitle.setText(playlist.getCurrentSong().getTitle());
-				} else if (player.status == SongPlayer.PAUSED)
-				{
-					player.play(sngList.getModel().getSize() - 1);
-				}
-			}
-		}
-		updatePlayIcon();
+			updatePlayIcon();
+		});
+		openThread.start();
 	}
 
 
@@ -801,11 +801,11 @@ public class MainFrame extends javax.swing.JFrame
 	}
 
 
-	private void songAdded()
+	private void songAdded(int index)
 	{
-		if (player.status == SongPlayer.STOPED)
+		if (player.status != SongPlayer.PLAYING && playlist.size() > 0)
 		{
-			play();
+			player.play(index);
 		}
 		sngTitle.setText(playlist.getCurrentSong().getTitle());
 		updatePlayIcon();
@@ -823,6 +823,10 @@ public class MainFrame extends javax.swing.JFrame
 		sngTitle.setText(playlist.getCurrentSong().getTitle());
 		MainFrame.playlist = playlist;
 	}
+
+	private final PlayListListener playListListener = (int index) -> {
+		songAdded(index);
+	};
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btmPanel;

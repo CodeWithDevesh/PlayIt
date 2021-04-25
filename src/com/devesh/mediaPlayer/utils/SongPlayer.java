@@ -20,7 +20,7 @@ import javazoom.jl.player.Player;
  * 
  * @author Devesh
  */
-public class SongPlayer {
+public final class SongPlayer {
 
 	public static final int PLAYING = 1;
 	public static final int PAUSED = 2;
@@ -49,6 +49,7 @@ public class SongPlayer {
 		this.playlist = playlist;
 		songChangeListeners = new ArrayList<>();
 		lock = new Object();
+		setVoulume(1f);
 	}
 
 

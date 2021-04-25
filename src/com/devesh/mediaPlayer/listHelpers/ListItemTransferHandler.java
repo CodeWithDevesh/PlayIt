@@ -96,19 +96,24 @@ public class ListItemTransferHandler extends TransferHandler {
 			javax.swing.JList.DropLocation loc = (javax.swing.JList.DropLocation) support
 					.getDropLocation();
 
-			Song song;
-			try
-			{
-				for(int i = 0 ; i < files.size() ; i++)
+			Thread thread = new Thread(() -> {
+				int i = 0;
+				for(File file : files)
 				{
-					song = new Song(files.get(i));
-					playlist.addSong(song, loc.getIndex() + i);
+					try
+					{
+						Song song = new Song(file);
+						playlist.addSong(song, loc.getIndex() + i);
+						i++;
+					} catch (InvalidDataException | IOException ex)
+					{
+						Logger.getLogger(
+						  ListItemTransferHandler.class.getName())
+						  .log(Level.SEVERE, null, ex);
+					}
 				}
-			} catch (InvalidDataException ex)
-			{
-				return false;
-			}
-
+			});
+			thread.start();
 		} catch (UnsupportedFlavorException | IOException ex)
 		{
 			Logger.getLogger(ListItemTransferHandler.class.getName())

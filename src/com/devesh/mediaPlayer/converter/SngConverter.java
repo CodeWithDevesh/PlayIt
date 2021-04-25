@@ -21,6 +21,7 @@ public class SngConverter {
 	private static FFmpeg ffmpeg = Application.ffmpeg;
 	private static FFprobe ffprobe = Application.ffprobe;
 	private static final Logger logger = Application.logger;
+	private static ProgressMonitor progressMonitor;
 
 	public static void autoConvert(FFmpegProbeResult in, String out,
 			ConversionListener listener)
@@ -36,10 +37,12 @@ public class SngConverter {
 			FFmpegBuilder builder = new FFmpegBuilder().addInput(in).addOutput(
 					out).done();
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-			ProgressMonitor progressMonitor = new ProgressMonitor(null,
-					"Converting you file...", null, 0, 100);
+
+			progressMonitor = new ProgressMonitor(null,
+					"Converting your file...", null, 0, 100);
+
 			FFmpegJob job = executor.createJob(builder, new ProgressListener() {
-				
+
 				final double duration_ns = in.getFormat().duration
 						* TimeUnit.SECONDS.toNanos(1);
 
@@ -50,7 +53,6 @@ public class SngConverter {
 							/ duration_ns;
 					progressMonitor.setProgress(
 							(int) Math.min(percentage * 100, 100));
-					System.out.println(Math.min(percentage * 100, 100));
 				}
 			});
 			Thread thread = new Thread(() -> {
@@ -105,8 +107,8 @@ public class SngConverter {
 					.addOutput(out.getPath()).addMetaTag("title", title)
 					.done();
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-			ProgressMonitor progressMonitor = new ProgressMonitor(null,
-					"Converting you file...", null, 0, 100);
+			progressMonitor = new ProgressMonitor(null,
+					"Converting your file...", null, 0, 100);
 			FFmpegJob job = executor.createJob(builder,
 					new ProgressListener() {
 						final double duration_ns = ffprobe
@@ -121,7 +123,6 @@ public class SngConverter {
 									/ duration_ns;
 							progressMonitor.setProgress(
 									(int) Math.min(percentage * 100, 100));
-							System.out.println(Math.min(percentage * 100, 100));
 						}
 					});
 			Thread thread = new Thread(() -> {
