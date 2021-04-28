@@ -17,13 +17,15 @@ public class Settings {
 		prefs.addPreferenceChangeListener((PreferenceChangeEvent evt) -> {
 			loadSettings();
 		});
+		theme = prefs.get(THEME_KEY, "Dark");
+		minOnClose = prefs.getBoolean(CLOSE_KEY, false);
+		showNotification = prefs.getBoolean(NOTIFICATION_KEY, true);
 		loadSettings();
 	}
 
 
 	public static void loadSettings()
 	{
-		theme = prefs.get(THEME_KEY, "Dark");
 		minOnClose = prefs.getBoolean(CLOSE_KEY, false);
 		showNotification = prefs.getBoolean(NOTIFICATION_KEY, true);
 	}

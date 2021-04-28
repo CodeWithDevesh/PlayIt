@@ -41,9 +41,7 @@ public class PreferencesFrame extends javax.swing.JFrame {
         lblNotification = new javax.swing.JLabel();
         cbxNotification = new javax.swing.JCheckBox();
         pnlSouth = new javax.swing.JPanel();
-        southIntPnl = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
-        lblMessage = new javax.swing.JLabel();
         pnlBtn = new javax.swing.JPanel();
         btnOK = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -138,15 +136,7 @@ public class PreferencesFrame extends javax.swing.JFrame {
         getContentPane().add(pnlMain, java.awt.BorderLayout.PAGE_START);
 
         pnlSouth.setLayout(new java.awt.BorderLayout());
-
-        southIntPnl.setLayout(new java.awt.BorderLayout());
-        southIntPnl.add(jSeparator1, java.awt.BorderLayout.PAGE_START);
-
-        lblMessage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblMessage.setText("You will have to restart playIt to apply changes");
-        southIntPnl.add(lblMessage, java.awt.BorderLayout.PAGE_END);
-
-        pnlSouth.add(southIntPnl, java.awt.BorderLayout.PAGE_START);
+        pnlSouth.add(jSeparator1, java.awt.BorderLayout.PAGE_START);
 
         pnlBtn.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
@@ -194,13 +184,11 @@ public class PreferencesFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBox cbxNotification;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lblHead;
-    private javax.swing.JLabel lblMessage;
     private javax.swing.JLabel lblMinimize;
     private javax.swing.JLabel lblNotification;
     private javax.swing.JLabel lblTheme;
     private javax.swing.JPanel pnlBtn;
     private javax.swing.JPanel pnlMain;
     private javax.swing.JPanel pnlSouth;
-    private javax.swing.JPanel southIntPnl;
     // End of variables declaration//GEN-END:variables
 }
