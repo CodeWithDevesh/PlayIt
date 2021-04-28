@@ -11,6 +11,7 @@ public class ConverterFrame extends javax.swing.JFrame {
 
 	public ConverterFrame() {
 		initComponents();
+		tfOutput.setText(Application.currentDir.getPath());
 	}
 
 

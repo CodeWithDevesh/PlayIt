@@ -8,7 +8,6 @@ import com.devesh.mediaPlayer.swing.Tray;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,6 +27,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class Application implements OpenRMI {
 
 	public static void main(String[] args)
 	{
-		Settings.loadSettings();
+		Settings.init();
 		try
 		{
 			initRMI(args);
@@ -86,7 +86,7 @@ public class Application implements OpenRMI {
 			if ("Dark".equals(Settings.getTheme()))
 				UIManager.setLookAndFeel(new FlatDarkLaf());
 			else
-				UIManager.setLookAndFeel(new FlatLightLaf());
+				UIManager.setLookAndFeel(new NimbusLookAndFeel());
 		} catch (Exception ex)
 		{
 			java.util.logging.Logger.getLogger(MainFrame.class.getName())

@@ -53,13 +53,12 @@ public class ListItemTransferHandler extends TransferHandler {
 				if (player != null)
 				{
 					int index = jList.getSelectedIndex();
-					while(index != -1)
+					while (index != -1)
 					{
 						if (playlist.currentSong == index)
 							player.next();
 						if (playlist.currentSong == index)
 							player.stop();
-						System.out.println(index);
 						playlist.removeSong(index);
 						index = jList.getSelectedIndex();
 					}
@@ -202,10 +201,10 @@ public class ListItemTransferHandler extends TransferHandler {
 					for(int i = 0 ; i < indices.size() ; i++)
 					{
 						song = songs.get(i);
-						System.out.println(song.getTitle());
 						playlist.addSong(song, i + loc.getIndex());
 					}
 				}
+				file.delete();
 			}
 			return true;
 		} catch (UnsupportedFlavorException | IOException ex)

@@ -57,9 +57,6 @@ public class MainFrame extends javax.swing.JFrame
 		});
 		secTimer.setRepeats(true);
 		secTimer.start();
-
-		if (!Settings.isMinOnClose())
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 
 
@@ -79,9 +76,6 @@ public class MainFrame extends javax.swing.JFrame
 		});
 		secTimer.setRepeats(true);
 		secTimer.start();
-
-		if (!Settings.isMinOnClose())
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 
 
@@ -123,8 +117,14 @@ public class MainFrame extends javax.swing.JFrame
         btnDownload = new javax.swing.JMenuItem();
         btnConverter = new javax.swing.JMenuItem();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("PlayIt Music Player");
         setMinimumSize(new java.awt.Dimension(300, 250));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 formKeyPressed(evt);
@@ -202,6 +202,7 @@ public class MainFrame extends javax.swing.JFrame
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 10.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
         ctrlPanel.add(progressBar, gridBagConstraints);
 
         sldVolume.setToolTipText("Volume");
@@ -223,6 +224,7 @@ public class MainFrame extends javax.swing.JFrame
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         ctrlPanel.add(sldVolume, gridBagConstraints);
 
         btmPanel.add(ctrlPanel);
@@ -384,7 +386,7 @@ public class MainFrame extends javax.swing.JFrame
 
         setJMenuBar(menu);
 
-        pack();
+        setSize(new java.awt.Dimension(640, 480));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -685,6 +687,12 @@ public class MainFrame extends javax.swing.JFrame
 		new PreferencesFrame().setVisible(true);
     }//GEN-LAST:event_btnPrefsActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+		if(Settings.isMinOnClose())
+			setVisible(false);
+		else 
+			Application.quit();
+    }//GEN-LAST:event_formWindowClosing
 
 	public void save()
 	{
@@ -827,7 +835,7 @@ public class MainFrame extends javax.swing.JFrame
 
 	private void everySecond()
 	{
-		if (!pbChange && player != null)
+		if (!pbChange && player != null && isVisible())
 			progressBar.setValue(player.getProgressPercentage());
 	}
 
