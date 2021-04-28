@@ -3,9 +3,13 @@ package com.devesh.mediaPlayer.utils;
 import com.devesh.mediaPlayer.Application;
 import com.devesh.mediaPlayer.converter.SngConverter;
 import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.Mp3File;
+import com.mpatric.mp3agic.UnsupportedTagException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import net.bramp.ffmpeg.FFmpeg;
@@ -17,7 +21,7 @@ public class Song implements Serializable {
 
 	private final File file;
 	private String title = null;
-	private final int length;
+	private int length;
 	private transient FFmpeg ffmpeg = Application.ffmpeg;
 	private transient FFprobe ffprobe = Application.ffprobe;
 
@@ -57,8 +61,6 @@ public class Song implements Serializable {
 				fileChooser.setMultiSelectionEnabled(false);
 				fileChooser.setCurrentDirectory(Application.currentDir);
 				int y = fileChooser.showSaveDialog(null);
-				Application.updateCurrentDir(
-						fileChooser.getCurrentDirectory());
 				if (y == JFileChooser.APPROVE_OPTION)
 				{
 					String out = fileChooser.getSelectedFile().getPath()

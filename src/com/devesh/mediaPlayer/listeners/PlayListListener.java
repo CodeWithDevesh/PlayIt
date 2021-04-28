@@ -1,4 +1,4 @@
-package com.devesh.mediaPlayer.utils;
+package com.devesh.mediaPlayer.listeners;
 
 
 public interface PlayListListener {

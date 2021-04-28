@@ -276,9 +276,13 @@ public final class SongPlayer {
 	 */
 	public void setProgress(int progress)
 	{
+		boolean toPause = false;
 		if (progress < 0 || progress > 100)
 			return;
-
+		
+		if(status == PAUSED)
+			toPause = true;
+		
 		if (status != STOPED)
 		{
 			stop();
@@ -293,10 +297,13 @@ public final class SongPlayer {
 				player.skipMilliSeconds(toSkip);
 			} catch (JavaLayerException ex)
 			{
+
 				Logger.getLogger(SongPlayer.class.getName()).log(Level.SEVERE,
 						null, ex);
 			}
 			updatingProgress = false;
+			if(toPause)
+				pause();
 		}
 	}
 

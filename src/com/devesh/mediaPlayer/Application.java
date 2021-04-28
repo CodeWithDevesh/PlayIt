@@ -8,6 +8,7 @@ import com.devesh.mediaPlayer.swing.Tray;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,6 +23,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 import java.util.logging.Level;
+import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
@@ -41,6 +43,8 @@ public class Application implements OpenRMI {
 	private static final Application app = new Application();
 	public static final File metaDir = new File(
 			System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
+	public static final Preferences prefs = Preferences
+			.userNodeForPackage(Application.class);
 	public static File currentDir;
 	public static FFmpeg ffmpeg;
 	public static FFprobe ffprobe;
@@ -48,8 +52,11 @@ public class Application implements OpenRMI {
 	private static final int RMIPort = 2023, httpPort = 2021;
 	public static Logger logger;
 
+	private static boolean playLast = false;
+
 	public static void main(String[] args)
 	{
+		Settings.loadSettings();
 		try
 		{
 			initRMI(args);
@@ -76,7 +83,10 @@ public class Application implements OpenRMI {
 
 		try
 		{
-			UIManager.setLookAndFeel(new FlatDarkLaf());
+			if ("Dark".equals(Settings.getTheme()))
+				UIManager.setLookAndFeel(new FlatDarkLaf());
+			else
+				UIManager.setLookAndFeel(new FlatLightLaf());
 		} catch (Exception ex)
 		{
 			java.util.logging.Logger.getLogger(MainFrame.class.getName())
@@ -156,8 +166,6 @@ public class Application implements OpenRMI {
 		fileChooser.setMultiSelectionEnabled(true);
 		fileChooser.setFileFilter(
 				new FileNameExtensionFilter("Music Files", "mp3", "ppl"));
-		// fileChooser.removeChoosableFileFilter(
-		// fileChooser.getAcceptAllFileFilter());
 		fileChooser.setCurrentDirectory(currentDir);
 		int i = fileChooser.showOpenDialog(null);
 
@@ -231,7 +239,7 @@ public class Application implements OpenRMI {
 				files[i] = new File(args[i]);
 			}
 			frame.openMedia(files);
-			player.play(playlist.size() - 1);
+			playLast = true;
 		} else
 		{
 			frame.setVisible(true);
@@ -248,12 +256,22 @@ public class Application implements OpenRMI {
 			File[] files = new File[1];
 			files[0] = new File(file);
 			frame.openMedia(files);
-			player.play(playlist.size() - 1);
+			playLast = true;
 		} else
 		{
 			frame.setVisible(true);
 			frame.requestFocus();
 			frame.toFront();
+		}
+	}
+
+
+	public static void opened()
+	{
+		if (playLast)
+		{
+			player.play(playlist.size() - 1);
+			playLast = false;
 		}
 	}
 
@@ -281,4 +299,7 @@ public class Application implements OpenRMI {
 		}
 	};
 
+	public static Tray getTray() {
+		return tray;
+	}
 }

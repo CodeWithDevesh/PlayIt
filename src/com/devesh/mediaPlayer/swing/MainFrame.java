@@ -1,13 +1,14 @@
 package com.devesh.mediaPlayer.swing;
 
 import com.devesh.mediaPlayer.Application;
+import static com.devesh.mediaPlayer.Application.logger;
+import com.devesh.mediaPlayer.Settings;
 import com.devesh.mediaPlayer.autostart.AutostartSetter;
-import com.devesh.mediaPlayer.converter.ConverterFrame;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.devesh.mediaPlayer.listHelpers.SngListCellRenderer;
 import com.devesh.mediaPlayer.listHelpers.ListItemTransferHandler;
-import com.devesh.mediaPlayer.utils.PlayListListener;
+import com.devesh.mediaPlayer.listeners.PlayListListener;
 import com.devesh.mediaPlayer.utils.Song;
 import com.mpatric.mp3agic.InvalidDataException;
 import java.awt.Desktop;
@@ -30,8 +31,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MainFrame extends javax.swing.JFrame
 		implements SongPlayer.SongChangeListener {
@@ -40,11 +39,9 @@ public class MainFrame extends javax.swing.JFrame
 	private static SongPlayer player;
 	private boolean pbChange = false;
 	private final ImageIcon imgPlay, imgPause;
-	Logger logger;
 	Timer secTimer;
 
 	public MainFrame() {
-		logger = LoggerFactory.getLogger(MainFrame.class);
 		playlist = new Playlist();
 		imgPlay = new javax.swing.ImageIcon(
 				getClass().getResource("/play.png"));
@@ -54,15 +51,19 @@ public class MainFrame extends javax.swing.JFrame
 		initComponents();
 
 		playlist.addListener(playListListener);
-		
-		new Timer(1000, (ActionEvent e) -> {
+
+		secTimer = new Timer(1000, (ActionEvent e) -> {
 			everySecond();
-		}).setRepeats(true);
+		});
+		secTimer.setRepeats(true);
+		secTimer.start();
+
+		if (!Settings.isMinOnClose())
+			setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 
 
 	public MainFrame(Playlist playlist, SongPlayer player) {
-		logger = LoggerFactory.getLogger(MainFrame.class);
 		MainFrame.playlist = playlist;
 		MainFrame.player = player;
 		imgPlay = new javax.swing.ImageIcon(
@@ -72,12 +73,15 @@ public class MainFrame extends javax.swing.JFrame
 		initComponents();
 
 		playlist.addListener(playListListener);
-		
+
 		secTimer = new Timer(1000, (ActionEvent e) -> {
 			everySecond();
 		});
 		secTimer.setRepeats(true);
 		secTimer.start();
+
+		if (!Settings.isMinOnClose())
+			setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 
 
@@ -112,6 +116,9 @@ public class MainFrame extends javax.swing.JFrame
         btnQuit = new javax.swing.JMenuItem();
         menEdit = new javax.swing.JMenu();
         btnAutostart = new javax.swing.JMenuItem();
+        btnPrefs = new javax.swing.JMenuItem();
+        menView = new javax.swing.JMenu();
+        jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
         menTools = new javax.swing.JMenu();
         btnDownload = new javax.swing.JMenuItem();
         btnConverter = new javax.swing.JMenuItem();
@@ -328,7 +335,27 @@ public class MainFrame extends javax.swing.JFrame
         });
         menEdit.add(btnAutostart);
 
+        btnPrefs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        btnPrefs.setText("Preferences");
+        btnPrefs.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnPrefs.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnPrefs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrefsActionPerformed(evt);
+            }
+        });
+        menEdit.add(btnPrefs);
+
         menu.add(menEdit);
+
+        menView.setText("View");
+
+        jCheckBoxMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        jCheckBoxMenuItem1.setText("Gallery View");
+        jCheckBoxMenuItem1.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        menView.add(jCheckBoxMenuItem1);
+
+        menu.add(menView);
 
         menTools.setText("Tools");
 
@@ -404,6 +431,7 @@ public class MainFrame extends javax.swing.JFrame
 					}
 				}
 			}
+			Application.opened();
 			updatePlayIcon();
 		});
 		openThread.start();
@@ -653,6 +681,10 @@ public class MainFrame extends javax.swing.JFrame
 		new ConverterFrame().setVisible(true);
     }//GEN-LAST:event_btnConverterActionPerformed
 
+    private void btnPrefsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrefsActionPerformed
+		new PreferencesFrame().setVisible(true);
+    }//GEN-LAST:event_btnPrefsActionPerformed
+
 
 	public void save()
 	{
@@ -791,9 +823,11 @@ public class MainFrame extends javax.swing.JFrame
 		sngList.repaint();
 		updatePlayIcon();
 	}
-	
-	private void everySecond(){
-		if(!pbChange && player != null)
+
+
+	private void everySecond()
+	{
+		if (!pbChange && player != null)
 			progressBar.setValue(player.getProgressPercentage());
 	}
 
@@ -816,6 +850,7 @@ public class MainFrame extends javax.swing.JFrame
 		default -> {
 		}
 		}
+		Application.getTray().updateTooltip();
 	}
 
 
@@ -856,14 +891,17 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JPanel btnPanel;
     private javax.swing.JButton btnPlay;
     private javax.swing.JButton btnPre;
+    private javax.swing.JMenuItem btnPrefs;
     private javax.swing.JMenuItem btnQuit;
     private javax.swing.JMenuItem btnSave;
     private javax.swing.JMenuItem btnShuffel;
     private javax.swing.JPanel ctrlPanel;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JMenu menEdit;
     private javax.swing.JMenu menFile;
     private javax.swing.JMenu menTools;
+    private javax.swing.JMenu menView;
     private javax.swing.JMenuBar menu;
     private javax.swing.JSlider progressBar;
     private javax.swing.JSlider sldVolume;
