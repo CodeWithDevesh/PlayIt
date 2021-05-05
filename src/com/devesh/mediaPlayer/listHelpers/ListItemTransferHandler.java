@@ -50,18 +50,18 @@ public class ListItemTransferHandler extends TransferHandler {
 				// player.stop();
 				// }
 				// playlist.removeSong(a);
-				if (player != null)
+				int index = jList.getSelectedIndex();
+				while (index != -1)
 				{
-					int index = jList.getSelectedIndex();
-					while (index != -1)
+					if (player != null)
 					{
 						if (playlist.currentSong == index)
 							player.next();
 						if (playlist.currentSong == index)
 							player.stop();
-						playlist.removeSong(index);
-						index = jList.getSelectedIndex();
 					}
+					playlist.removeSong(index);
+					index = jList.getSelectedIndex();
 				}
 			}
 		}

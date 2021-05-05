@@ -13,8 +13,10 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 public final class Tray {
 
@@ -22,6 +24,8 @@ public final class Tray {
 	private final TrayIcon icon;
 	private final SongPlayer player;
 	private final Playlist playlist;
+
+	private int clicks;
 
 	public Tray(SongPlayer player, Playlist playlist, MainFrame frame) {
 
@@ -90,7 +94,8 @@ public final class Tray {
 
 		MenuItem miOpen = new MenuItem("Open");
 		miOpen.addActionListener((ActionEvent e) -> {
-			Application.showOpenDialog();
+			File[] files = Application.showOpenDialog();
+			frame.openMedia(files);
 		});
 		menu.add(miOpen);
 
@@ -130,9 +135,24 @@ public final class Tray {
 			{
 				if (e.getButton() == MouseEvent.BUTTON1)
 				{
-					frame.setVisible(!frame.isVisible());
-					frame.requestFocus();
-					frame.toFront();
+					if (e.getClickCount() == 2)
+					{
+						clicks = 2;
+						frame.setVisible(!frame.isVisible());
+						frame.requestFocus();
+						frame.toFront();
+					}
+
+					if (e.getClickCount() == 1)
+					{
+						clicks = 1;
+						Timer timer = new Timer(500, (ActionEvent evt) -> {
+							if (clicks == 1)
+								frame.play();
+						});
+						timer.setRepeats(false);
+						timer.start();
+					}
 				}
 			}
 

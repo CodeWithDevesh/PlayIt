@@ -1,9 +1,12 @@
 package com.devesh.mediaPlayer.autostart;
 
 import com.devesh.mediaPlayer.Application;
+import static com.devesh.mediaPlayer.Application.logger;
 import com.devesh.mediaPlayer.listHelpers.ListItemTransferHandler;
 import com.devesh.mediaPlayer.swing.MainFrame;
 import com.devesh.mediaPlayer.utils.Playlist;
+import com.devesh.mediaPlayer.utils.Song;
+import com.mpatric.mp3agic.InvalidDataException;
 import com.registry.RegStringValue;
 import com.registry.RegistryKey;
 import com.registry.ValueType;
@@ -16,8 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
@@ -253,33 +256,41 @@ public class AutostartSetter extends javax.swing.JDialog {
 
 	public void openMedia(File[] files)
 	{
-		File file = files[0];
-		String filename = file.getPath();
-
-		if (filename.endsWith(".ppl"))
-		{
-			try
+		Thread openThread = new Thread(() -> {
+			for(File file : files)
 			{
-				try (ObjectInputStream oi = new ObjectInputStream(
-						new FileInputStream(file)))
+				String filename = file.getPath();
+				if (filename.endsWith(".ppl"))
 				{
-					playlist = (Playlist) oi.readObject();
-					playlist.currentSong = 0;
-					sngList.setModel(playlist.getListModel());
-					sngList.setTransferHandler(
-							new ListItemTransferHandler(playlist, null));
-					oi.close();
+					try
+					{
+						Scanner scanner = new Scanner(file);
+						while (scanner.hasNext())
+						{
+							playlist.addSong(
+									new Song(
+											new File(scanner.nextLine().replace(
+													"\n", ""))));
+						}
+					} catch (InvalidDataException | IOException ex)
+					{
+						logger.error("Error while opening playlist", ex);
+					}
+				} else
+				{
+					try
+					{
+						playlist.addSong(new Song(file));
+					} catch (InvalidDataException | IOException ex)
+					{
+						logger.error(
+								"Error while opening file: " + file.getPath(),
+								ex);
+					}
 				}
-			} catch (IOException | ClassNotFoundException ex)
-			{
-				Logger.getLogger(MainFrame.class.getName())
-						.log(Level.SEVERE, null, ex);
 			}
-		} else
-		{
-			playlist.addSongs(new ArrayList<>(
-					Arrays.asList(files)));
-		}
+		});
+		openThread.start();
 	}
 
 

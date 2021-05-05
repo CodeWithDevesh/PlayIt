@@ -25,11 +25,15 @@ import java.util.logging.Level;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFprobe;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.dispatcher.SwingDispatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,33 +100,50 @@ public class Application implements OpenRMI {
 		playlist = new Playlist();
 		player = new SongPlayer(playlist);
 
-		frame = new MainFrame(playlist, player);
-		try
-		{
-			BufferedImage img = ImageIO
-					.read(Application.class.getResource("/icon.png"));
-			frame.setIconImage(img);
-		} catch (IOException ex)
-		{
-			logger.error(null, ex);
-		}
-		frame.requestFocus();
-
-		player.addSongChangeListener(frame);
-
-		tray = new Tray(player, playlist, frame);
-
-		if (args.length > 0)
-		{
-			File[] files = new File[args.length];
-			for(int i = 0 ; i < files.length ; i++)
+		SwingUtilities.invokeLater(() -> {
+			frame = new MainFrame(playlist, player);
+			try
 			{
-				System.out.println(args[i]);
-				files[i] = new File(args[i]);
+				BufferedImage img = ImageIO
+						.read(Application.class.getResource("/icon.png"));
+				frame.setIconImage(img);
+			} catch (IOException ex)
+			{
+				logger.error(null, ex);
 			}
-			frame.openMedia(files);
-		} else
-			frame.setVisible(true);
+			frame.requestFocus();
+
+			player.addSongChangeListener(frame);
+
+			tray = new Tray(player, playlist, frame);
+
+			if (args.length > 0)
+			{
+				File[] files = new File[args.length];
+				for(int i = 0 ; i < files.length ; i++)
+				{
+					System.out.println(args[i]);
+					files[i] = new File(args[i]);
+				}
+				frame.openMedia(files);
+			} else
+				frame.setVisible(true);
+
+			try
+			{
+				java.util.logging.Logger natlogger = java.util.logging.Logger
+						.getLogger(GlobalScreen.class.getPackage().getName());
+				natlogger.setLevel(Level.OFF);
+				natlogger.setUseParentHandlers(false);
+				GlobalScreen.setEventDispatcher(new SwingDispatchService());
+				GlobalScreen.registerNativeHook();
+				GlobalScreen.addNativeKeyListener(frame);
+			} catch (NativeHookException ex)
+			{
+				logger.error(null, ex);
+			}
+		});
+
 	}
 
 
@@ -195,7 +216,8 @@ public class Application implements OpenRMI {
 			{
 				logger.error(null, ex);
 			}
-		}
+		} else
+			currentDir = new File(System.getProperty("user.home"));
 	}
 
 
@@ -299,7 +321,8 @@ public class Application implements OpenRMI {
 		}
 	};
 
-	public static Tray getTray() {
+	public static Tray getTray()
+	{
 		return tray;
 	}
 }

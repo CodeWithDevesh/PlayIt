@@ -7,10 +7,12 @@ public class Settings {
 	public static String THEME_KEY = "THEME";
 	public static String CLOSE_KEY = "CLOSE_METHOD";
 	public static String NOTIFICATION_KEY = "SHOW_NOTIFICATION";
+	public static String PAUSEBTN_ENABLED = "PAUSEBTN_ENABLSED";
 
 	private static boolean showNotification;
 	private static boolean minOnClose;
 	private static String theme;
+	private static boolean pauseEnbl;
 
 	public static void init()
 	{
@@ -20,6 +22,7 @@ public class Settings {
 		theme = prefs.get(THEME_KEY, "Dark");
 		minOnClose = prefs.getBoolean(CLOSE_KEY, false);
 		showNotification = prefs.getBoolean(NOTIFICATION_KEY, true);
+		pauseEnbl = prefs.getBoolean(PAUSEBTN_ENABLED, true);
 		loadSettings();
 	}
 
@@ -28,6 +31,7 @@ public class Settings {
 	{
 		minOnClose = prefs.getBoolean(CLOSE_KEY, false);
 		showNotification = prefs.getBoolean(NOTIFICATION_KEY, true);
+		pauseEnbl = prefs.getBoolean(PAUSEBTN_ENABLED, true);
 	}
 
 
@@ -47,5 +51,8 @@ public class Settings {
 	{
 		return theme;
 	}
-
+	
+	public static boolean isPauseBtn(){
+		return pauseEnbl;
+	}
 }

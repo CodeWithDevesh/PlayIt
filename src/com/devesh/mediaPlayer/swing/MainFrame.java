@@ -31,9 +31,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
 
 public class MainFrame extends javax.swing.JFrame
-		implements SongPlayer.SongChangeListener {
+		implements SongPlayer.SongChangeListener, NativeKeyListener {
 
 	private static Playlist playlist;
 	private static SongPlayer player;
@@ -400,6 +402,8 @@ public class MainFrame extends javax.swing.JFrame
 
 	public void openMedia(File[] files)
 	{
+		if (files == null)
+			return;
 		Thread openThread = new Thread(() -> {
 			for(File file : files)
 			{
@@ -694,6 +698,7 @@ public class MainFrame extends javax.swing.JFrame
 			Application.quit();
     }//GEN-LAST:event_formWindowClosing
 
+
 	public void save()
 	{
 		metaDir.mkdirs();
@@ -842,23 +847,29 @@ public class MainFrame extends javax.swing.JFrame
 
 	private void updatePlayIcon()
 	{
-		switch (player.status) {
-		case SongPlayer.STOPED -> {
-			btnPlay.setIcon(imgPlay);
-			sngTitle.setText("No Song Playing");
-		}
-		case SongPlayer.PAUSED -> {
-			btnPlay.setIcon(imgPlay);
-			sngTitle.setText(playlist.getCurrentSong().getTitle());
-		}
-		case SongPlayer.PLAYING -> {
-			btnPlay.setIcon(imgPause);
-			sngTitle.setText(playlist.getCurrentSong().getTitle());
-		}
-		default -> {
-		}
-		}
-		Application.getTray().updateTooltip();
+		Runnable run = () -> {
+			switch (player.status) {
+			case SongPlayer.STOPED -> {
+				btnPlay.setIcon(imgPlay);
+				sngTitle.setText("No Song Playing");
+			}
+			case SongPlayer.PAUSED -> {
+				btnPlay.setIcon(imgPlay);
+				sngTitle.setText(playlist.getCurrentSong().getTitle());
+			}
+			case SongPlayer.PLAYING -> {
+				btnPlay.setIcon(imgPause);
+				sngTitle.setText(playlist.getCurrentSong().getTitle());
+			}
+			default -> {
+			}
+			}
+			Application.getTray().updateTooltip();
+		};
+		if (SwingUtilities.isEventDispatchThread())
+			run.run();
+		else
+			SwingUtilities.invokeLater(run);
 	}
 
 
@@ -920,4 +931,35 @@ public class MainFrame extends javax.swing.JFrame
 	private int cursor = -1;
 	private static final File metaDir = new File(
 	  System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
+
+	private boolean shiftDwn = false;
+	private boolean toPlayPause = true;
+
+	@Override
+	public void nativeKeyTyped(NativeKeyEvent nke) {
+	}
+
+	@Override
+	public void nativeKeyPressed(NativeKeyEvent nke) {
+		if (nke.getKeyCode() == NativeKeyEvent.VC_SHIFT || nke.getKeyCode() == 3638) {
+			shiftDwn = true;
+		}
+		if (nke.getKeyCode() == NativeKeyEvent.VC_PAUSE && toPlayPause) {
+			if (Settings.isPauseBtn()) {
+				play();
+			}
+			toPlayPause = false;
+		}
+	}
+
+	@Override
+	public void nativeKeyReleased(NativeKeyEvent nke) {
+		if (nke.getKeyCode() == NativeKeyEvent.VC_SHIFT || nke.getKeyCode() == 3638) {
+			shiftDwn = false;
+		}
+
+		if (nke.getKeyCode() == NativeKeyEvent.VC_PAUSE) {
+			toPlayPause = true;
+		}
+	}
 }

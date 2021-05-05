@@ -244,7 +244,6 @@ public final class SongPlayer {
 	public void setVoulume(float volume)
 	{
 		currentVol = (float) ((volume * 30) - 30);
-		System.out.println(currentVol);
 		if (volume == 0)
 			currentVol = -80f;
 	}
@@ -279,10 +278,10 @@ public final class SongPlayer {
 		boolean toPause = false;
 		if (progress < 0 || progress > 100)
 			return;
-		
-		if(status == PAUSED)
+
+		if (status == PAUSED)
 			toPause = true;
-		
+
 		if (status != STOPED)
 		{
 			stop();
@@ -302,7 +301,7 @@ public final class SongPlayer {
 						null, ex);
 			}
 			updatingProgress = false;
-			if(toPause)
+			if (toPause)
 				pause();
 		}
 	}
@@ -321,6 +320,7 @@ public final class SongPlayer {
 		songChangeListeners.add(listener);
 	}
 
+	
 	/**
 	 * An interface for listening to song change events
 	 */
