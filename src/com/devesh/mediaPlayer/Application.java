@@ -55,7 +55,7 @@ public class Application implements OpenRMI {
 	public static FFmpeg ffmpeg;
 	public static FFprobe ffprobe;
 
-	private static final int RMIPort = 2021, httpPort = 2023;
+	private static final int RMIPort = 2020, httpPort = 2021;
 	public static Logger logger;
 
 	private static boolean playLast = false;
@@ -260,10 +260,7 @@ public class Application implements OpenRMI {
 			playLast = true;
 		} else
 		{
-			frame.setVisible(true);
-			frame.requestFocus();
-			frame.toFront();
-			frame.setExtendedState(Frame.NORMAL);
+			showWindow();
 		}
 	}
 
@@ -278,10 +275,7 @@ public class Application implements OpenRMI {
 			playLast = true;
 		} else
 		{
-			frame.setVisible(true);
-			frame.requestFocus();
-			frame.toFront();
-			frame.setExtendedState(Frame.NORMAL);
+			showWindow();
 		}
 	}
 
@@ -340,5 +334,14 @@ public class Application implements OpenRMI {
 	public static Playlist getPlaylist()
 	{
 		return playlist;
+	}
+
+
+	public static void showWindow()
+	{
+		frame.setVisible(true);
+		frame.requestFocus();
+		frame.toFront();
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 	}
 }
