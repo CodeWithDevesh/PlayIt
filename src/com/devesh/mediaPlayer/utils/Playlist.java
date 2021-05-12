@@ -12,13 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Playlist implements Serializable {
-	
+
 	private final ArrayList<Song> list;
 	private final DefaultListModel<String> songs;
 	public int currentSong;
 	private transient ArrayList<PlayListListener> listeners = new ArrayList<>();
 	private final Logger logger = LoggerFactory.getLogger(Playlist.class);
-	
+
 	public Playlist() {
 		list = new ArrayList<>();
 		this.songs = new DefaultListModel<>();
@@ -65,7 +65,7 @@ public class Playlist implements Serializable {
 		list.add(song);
 		songs.addElement(song.getTitle());
 		listeners.forEach(listener -> {
-			listener.sngAdded(size()-1);
+			listener.sngAdded(size() - 1);
 		});
 	}
 
@@ -102,10 +102,10 @@ public class Playlist implements Serializable {
 			this.songs.addElement(song.getTitle());
 		});
 		listeners.forEach(listener -> {
-			listener.sngAdded(size()-1);
+			listener.sngAdded(size() - 1);
 		});
 	}
-	
+
 
 	public Song getSong(int index)
 	{
@@ -119,6 +119,10 @@ public class Playlist implements Serializable {
 			currentSong--;
 		list.remove(index);
 		songs.remove(index);
+
+		listeners.forEach(listener -> {
+			listener.sngRemoved(index);
+		});
 	}
 
 
@@ -153,6 +157,47 @@ public class Playlist implements Serializable {
 		}
 
 		currentSong = list.indexOf(songPlaying);
+		listeners.forEach(listener -> {
+			listener.shuffeled();
+		});
+	}
+
+
+	public void shuffel(ArrayList<Integer> indices)
+	{
+		ArrayList<Song> shfSongs = new ArrayList<>();
+		Song songPlaying = list.get(currentSong);
+
+		indices.forEach(i -> {
+			shfSongs.add(list.get(i));
+			list.remove((int) i);
+			list.add(i, null);
+		});
+
+		for(int x = 0 ; x < shfSongs.size() ; x++)
+		{
+			while (true)
+			{
+				int i = new Random().nextInt(list.size());
+				if (indices.contains(i)
+						&& list.get(i) == null)
+				{
+					list.remove(i);
+					list.add(i, shfSongs.get(x));
+					break;
+				}
+			}
+		}
+		songs.clear();
+		for(int i = 0 ; i < list.size() ; i++)
+		{
+			songs.addElement(list.get(i).getTitle());
+		}
+
+		currentSong = list.indexOf(songPlaying);
+		listeners.forEach(listener -> {
+			listener.shuffeled();
+		});
 	}
 
 
@@ -212,9 +257,11 @@ public class Playlist implements Serializable {
 	{
 		return list.size();
 	}
-	
-	public void addListener(PlayListListener listener){
-		if(listeners == null)
+
+
+	public void addListener(PlayListListener listener)
+	{
+		if (listeners == null)
 			listeners = new ArrayList<>();
 		listeners.add(listener);
 	}

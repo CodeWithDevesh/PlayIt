@@ -3,9 +3,14 @@ package com.devesh.mediaPlayer.swing;
 import com.devesh.mediaPlayer.Application;
 import com.devesh.mediaPlayer.converter.SngConverter;
 import static com.devesh.mediaPlayer.Application.currentDir;
+import static com.devesh.mediaPlayer.Application.ffprobe;
+import static com.devesh.mediaPlayer.Application.logger;
 import static com.devesh.mediaPlayer.Application.updateCurrentDir;
 import java.io.File;
+import java.io.IOException;
 import javax.swing.JFileChooser;
+import net.bramp.ffmpeg.probe.FFmpegFormat;
+import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 
 public class ConverterFrame extends javax.swing.JFrame {
 
@@ -33,6 +38,7 @@ public class ConverterFrame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         tfTitle = new javax.swing.JTextField();
         tfFormat = new javax.swing.JTextField();
+        btnAuto = new javax.swing.JButton();
         pnlSouth = new javax.swing.JPanel();
         lblMessage = new javax.swing.JLabel();
         pnlBtn = new javax.swing.JPanel();
@@ -74,7 +80,6 @@ public class ConverterFrame extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         gridBagConstraints.weightx = 1.0;
@@ -106,12 +111,11 @@ public class ConverterFrame extends javax.swing.JFrame {
         pnlMain.add(btnOutBrw, gridBagConstraints);
 
         cbFormat.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "mp3", "wav", "ogg", "acc", "flac" }));
-        cbFormat.setMinimumSize(new java.awt.Dimension(1000, 600));
+        cbFormat.setMinimumSize(null);
         cbFormat.setPreferredSize(null);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 5);
@@ -140,11 +144,14 @@ public class ConverterFrame extends javax.swing.JFrame {
 
         jLabel1.setText("Title");
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 6, 0);
         pnlMain.add(jLabel1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 5);
@@ -158,6 +165,19 @@ public class ConverterFrame extends javax.swing.JFrame {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 5);
         pnlMain.add(tfFormat, gridBagConstraints);
+
+        btnAuto.setText("Auto");
+        btnAuto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAutoActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 5);
+        pnlMain.add(btnAuto, gridBagConstraints);
 
         getContentPane().add(pnlMain, java.awt.BorderLayout.CENTER);
 
@@ -274,7 +294,35 @@ public class ConverterFrame extends javax.swing.JFrame {
 		lblMessage.setText("");
     }//GEN-LAST:event_btnConvertActionPerformed
 
+    private void btnAutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAutoActionPerformed
+		try {
+			String title = null;
+			File file = new File(tfInput.getText());
+			if(!file.exists())
+				return;
+			
+			FFmpegProbeResult result = ffprobe.probe(file.getPath());
+			FFmpegFormat format = result.getFormat();
+			
+			if (format.tags != null)
+				title = format.tags.get("title");
+			if (title == null || title.isBlank())
+			{
+				title = file.getName();
+				String[] formatNames = format.format_name.split(",");
+				for(String formatName : formatNames)
+					if (title.endsWith(formatName))
+						title = title.substring(0,
+								title.length() - (formatName.length() + 1));
+			}
+			tfTitle.setText(title);
+		} catch (IOException ex) {
+			logger.error(null, ex);
+		}
+    }//GEN-LAST:event_btnAutoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAuto;
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnConvert;
     private javax.swing.JButton btnInBrw;

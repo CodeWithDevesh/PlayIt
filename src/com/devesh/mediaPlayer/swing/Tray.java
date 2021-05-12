@@ -6,6 +6,7 @@ import com.devesh.mediaPlayer.Settings;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import java.awt.AWTException;
+import java.awt.Frame;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
@@ -68,6 +69,7 @@ public final class Tray {
 				frame.setVisible(true);
 				frame.toFront();
 				frame.requestFocus();
+				frame.setExtendedState(Frame.NORMAL);
 			}
 		});
 		menu.add(miShowHide);
@@ -141,6 +143,7 @@ public final class Tray {
 						frame.setVisible(!frame.isVisible());
 						frame.requestFocus();
 						frame.toFront();
+						frame.setExtendedState(Frame.NORMAL);
 					}
 
 					if (e.getClickCount() == 1)

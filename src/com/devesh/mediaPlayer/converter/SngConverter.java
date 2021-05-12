@@ -24,7 +24,7 @@ public class SngConverter {
 	private static ProgressMonitor progressMonitor;
 
 	public static void autoConvert(FFmpegProbeResult in, String out,
-			ConversionListener listener)
+			ConversionListener listener, String title)
 	{
 		try
 		{
@@ -34,8 +34,10 @@ public class SngConverter {
 				ffprobe = new FFprobe("ffprobe.exe");
 			}
 
-			FFmpegBuilder builder = new FFmpegBuilder().addInput(in).addOutput(
-					out).done();
+			FFmpegBuilder builder = new FFmpegBuilder()
+			  .addInput(in)
+			  .addOutput(out).addMetaTag("title", title)
+			  .done();
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 
 			progressMonitor = new ProgressMonitor(null,
@@ -105,9 +107,10 @@ public class SngConverter {
 			FFmpegBuilder builder = new FFmpegBuilder()
 					.addInput(in.getPath())
 					.addOutput(out.getPath()).addMetaTag("title", title)
+					.setAudioBitRate(320000)
 					.done();
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-			progressMonitor = new ProgressMonitor(null,
+			progressMonitor = new ProgressMonitor(Application.getFrame(),
 					"Converting your file...", null, 0, 100);
 			FFmpegJob job = executor.createJob(builder,
 					new ProgressListener() {

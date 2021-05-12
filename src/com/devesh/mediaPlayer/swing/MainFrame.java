@@ -2,6 +2,8 @@ package com.devesh.mediaPlayer.swing;
 
 import com.devesh.mediaPlayer.Application;
 import static com.devesh.mediaPlayer.Application.logger;
+import com.devesh.mediaPlayer.Managers.MainFrameManager;
+import com.devesh.mediaPlayer.Managers.SngListManager;
 import com.devesh.mediaPlayer.Settings;
 import com.devesh.mediaPlayer.autostart.AutostartSetter;
 import com.devesh.mediaPlayer.utils.Playlist;
@@ -10,11 +12,10 @@ import com.devesh.mediaPlayer.listHelpers.SngListCellRenderer;
 import com.devesh.mediaPlayer.listHelpers.ListItemTransferHandler;
 import com.devesh.mediaPlayer.listeners.PlayListListener;
 import com.devesh.mediaPlayer.utils.Song;
+import com.devesh.mediaPlayer.Managers.VolumeManager;
 import com.mpatric.mp3agic.InvalidDataException;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,45 +23,26 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Scanner;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
 
 public class MainFrame extends javax.swing.JFrame
-		implements SongPlayer.SongChangeListener, NativeKeyListener {
+		implements SongPlayer.SongChangeListener {
 
 	private static Playlist playlist;
 	private static SongPlayer player;
 	private boolean pbChange = false;
 	private final ImageIcon imgPlay, imgPause;
 	Timer secTimer;
+	private String view = "list";
 
-	public MainFrame() {
-		playlist = new Playlist();
-		imgPlay = new javax.swing.ImageIcon(
-				getClass().getResource("/play.png"));
-		imgPause = new javax.swing.ImageIcon(
-				getClass().getResource("/pause.png"));
-		player = new SongPlayer(playlist);
-		initComponents();
-
-		playlist.addListener(playListListener);
-
-		secTimer = new Timer(1000, (ActionEvent e) -> {
-			everySecond();
-		});
-		secTimer.setRepeats(true);
-		secTimer.start();
-	}
-
+	public static VolumeManager volManager;
+	public static SngListManager sngListManager;
+	public static MainFrameManager manager;
 
 	public MainFrame(Playlist playlist, SongPlayer player) {
 		MainFrame.playlist = playlist;
@@ -69,6 +51,13 @@ public class MainFrame extends javax.swing.JFrame
 				getClass().getResource("/play.png"));
 		imgPause = new javax.swing.ImageIcon(
 				getClass().getResource("/pause.png"));
+
+		volManager = new VolumeManager();
+		sngListManager = new SngListManager(this);
+		manager = new MainFrameManager(this);
+		this.addKeyListener(manager);
+		galleryPanel = sngListManager.getGalleryPanel();
+
 		initComponents();
 
 		playlist.addListener(playListListener);
@@ -78,6 +67,8 @@ public class MainFrame extends javax.swing.JFrame
 		});
 		secTimer.setRepeats(true);
 		secTimer.start();
+
+		setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
 	}
 
 
@@ -100,10 +91,10 @@ public class MainFrame extends javax.swing.JFrame
         btnPlay = new javax.swing.JButton();
         btnNext = new javax.swing.JButton();
         progressBar = new javax.swing.JSlider();
-        sldVolume = new javax.swing.JSlider();
+        sldVolume = volManager.getSlider();
         jScrollPane = new javax.swing.JScrollPane();
         spPanel = new javax.swing.JPanel();
-        sngList = new javax.swing.JList<>();
+        sngList = sngListManager.GetList();
         menu = new javax.swing.JMenuBar();
         menFile = new javax.swing.JMenu();
         btnSave = new javax.swing.JMenuItem();
@@ -114,7 +105,7 @@ public class MainFrame extends javax.swing.JFrame
         btnAutostart = new javax.swing.JMenuItem();
         btnPrefs = new javax.swing.JMenuItem();
         menView = new javax.swing.JMenu();
-        jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
+        cbxGallery = new javax.swing.JCheckBoxMenuItem();
         menTools = new javax.swing.JMenu();
         btnDownload = new javax.swing.JMenuItem();
         btnConverter = new javax.swing.JMenuItem();
@@ -125,11 +116,6 @@ public class MainFrame extends javax.swing.JFrame
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
-            }
-        });
-        addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                formKeyPressed(evt);
             }
         });
 
@@ -212,17 +198,7 @@ public class MainFrame extends javax.swing.JFrame
         sldVolume.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         sldVolume.setDoubleBuffered(true);
         sldVolume.setFocusable(false);
-        sldVolume.setPreferredSize(new java.awt.Dimension(50, 21));
-        sldVolume.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                sldVolumeStateChanged(evt);
-            }
-        });
-        sldVolume.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                sldVolumeMouseReleased(evt);
-            }
-        });
+        sldVolume.setPreferredSize(new java.awt.Dimension(51, 21));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -241,7 +217,6 @@ public class MainFrame extends javax.swing.JFrame
         spPanel.setAutoscrolls(true);
         spPanel.setLayout(new java.awt.BorderLayout());
 
-        sngList.setBorder(null);
         sngList.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         sngList.setModel(playlist.getListModel());
         sngList.setCellRenderer(new SngListCellRenderer(playlist));
@@ -249,21 +224,6 @@ public class MainFrame extends javax.swing.JFrame
         sngList.setDragEnabled(true);
         sngList.setDropMode(javax.swing.DropMode.INSERT);
         sngList.setFocusable(false);
-        sngList.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                sngListFocusGained(evt);
-            }
-        });
-        sngList.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                sngListMouseClicked(evt);
-            }
-        });
-        sngList.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                sngListKeyPressed(evt);
-            }
-        });
         sngList.setTransferHandler(new ListItemTransferHandler(playlist, player));
         spPanel.add(sngList, java.awt.BorderLayout.CENTER);
 
@@ -354,10 +314,14 @@ public class MainFrame extends javax.swing.JFrame
 
         menView.setText("View");
 
-        jCheckBoxMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        jCheckBoxMenuItem1.setText("Gallery View");
-        jCheckBoxMenuItem1.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        menView.add(jCheckBoxMenuItem1);
+        cbxGallery.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        cbxGallery.setText("Gallery View");
+        cbxGallery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxGalleryActionPerformed(evt);
+            }
+        });
+        menView.add(cbxGallery);
 
         menu.add(menView);
 
@@ -456,36 +420,6 @@ public class MainFrame extends javax.swing.JFrame
 		player.previous();
     }//GEN-LAST:event_btnPreActionPerformed
 
-    private void sngListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sngListMouseClicked
-		if(evt.getClickCount() == 2 && evt.getButton() == MouseEvent.BUTTON1){
-			int index = sngList.getSelectedIndex();
-			if(index != -1)
-				player.play(index);
-		}else if(SwingUtilities.isRightMouseButton(evt)){
-			showSngListPopup(evt);
-		}
-		
-		if(!SwingUtilities.isMiddleMouseButton(evt)){
-			cursor = sngList.locationToIndex(evt.getPoint());
-		}
-		
-		updatePlayIcon();
-    }//GEN-LAST:event_sngListMouseClicked
-
-    private void sldVolumeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sldVolumeStateChanged
-		player.setVoulume(sldVolume.getValue()/100f);
-    }//GEN-LAST:event_sldVolumeStateChanged
-
-    private void sngListKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sngListKeyPressed
-		if((evt.getKeyCode() == KeyEvent.VK_ENTER || evt.getKeyCode() == KeyEvent.VK_NUMPAD5) 
-				&& sngList.hasFocus()){
-			int index = sngList.getSelectedIndex();
-			if(index != -1)
-				player.play(index);
-		}
-		updatePlayIcon();
-    }//GEN-LAST:event_sngListKeyPressed
-
     private void progressBarMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_progressBarMousePressed
 		pbChange = true;
     }//GEN-LAST:event_progressBarMousePressed
@@ -499,146 +433,9 @@ public class MainFrame extends javax.swing.JFrame
 		pbChange = false;
     }//GEN-LAST:event_progressBarMouseReleased
 
-    private void sldVolumeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sldVolumeMouseReleased
-    }//GEN-LAST:event_sldVolumeMouseReleased
-
-    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-		int index;
-		
-		switch (evt.getKeyCode()) {
-			
-			case KeyEvent.VK_UP -> {
-				if(evt.isControlDown())
-					sldVolume.setValue(sldVolume.getValue() + 5);
-				else if(evt.isShiftDown()){
-					moveUp(true);
-				}
-				else
-					moveUp(false);
-			}
-			
-			case KeyEvent.VK_DOWN -> {
-				if(evt.isControlDown())
-					sldVolume.setValue(sldVolume.getValue() - 5);
-				else if(evt.isShiftDown())
-					moveDown(true);
-				else
-					moveDown(false);
-			}
-			
-			case KeyEvent.VK_SPACE -> play();
-			
-			case KeyEvent.VK_LEFT -> {
-				if(evt.isControlDown()){
-					player.previous();
-					sngList.ensureIndexIsVisible(playlist.currentSong);
-				}
-			}
-			
-			case KeyEvent.VK_RIGHT -> {
-				if(evt.isControlDown()){
-					player.next();
-					sngList.ensureIndexIsVisible(playlist.currentSong);
-				}
-			}
-			
-			case KeyEvent.VK_ENTER -> {
-				index = sngList.getSelectedIndex();
-				if(index != -1){
-					player.play(index);
-				}
-			}
-			
-			case KeyEvent.VK_NUMPAD5 -> {
-				index = sngList.getSelectedIndex();
-				if(index != -1)
-					player.play(index);
-			}
-			
-			case KeyEvent.VK_DELETE -> {
-				removeSelected();
-			}
-			
-			case KeyEvent.VK_W -> {
-				if(evt.isControlDown())
-					setVisible(false);
-			}
-			
-			default -> {
-			}
-		}
-		updatePlayIcon();
-    }//GEN-LAST:event_formKeyPressed
-
     private void btnShuffelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShuffelActionPerformed
 		shuffel();
     }//GEN-LAST:event_btnShuffelActionPerformed
-
-
-	private void moveUp(boolean keepSelected)
-	{
-		if (sngList.getSelectedIndex() == -1)
-			cursor = -1;
-		if (cursor > 0)
-		{
-			if (keepSelected)
-			{
-				int[] selectedInd = sngList.getSelectedIndices();
-				int destInd = Arrays.binarySearch(selectedInd, cursor - 1);
-				int[] newSelection;
-				// check if the new cursor pos is selected
-				if (destInd < 0)
-				{
-					// if not select it
-					newSelection = Arrays.copyOf(selectedInd,
-							selectedInd.length + 1);
-					newSelection[newSelection.length - 1] = --cursor;
-				} else
-				{
-					// deselect it
-					selectedInd[destInd + 1] = -1;
-					newSelection = selectedInd;
-					cursor--;
-				}
-				sngList.setSelectedIndices(newSelection);
-			} else
-				sngList.setSelectedIndex(--cursor);
-			sngList.ensureIndexIsVisible(cursor);
-		}
-	}
-
-
-	private void moveDown(boolean keepSelected)
-	{
-		if (sngList.getSelectedIndex() == -1)
-			cursor = -1;
-		if (cursor != sngList.getModel().getSize() - 1)
-		{
-			if (keepSelected)
-			{
-				int[] selectedInd = sngList.getSelectedIndices();
-				int destInd = Arrays.binarySearch(selectedInd, cursor + 1);
-				int[] newSelection;
-				// check if the new cursor pos is selected
-				if (destInd < 0)
-				{
-					// if not select it
-					newSelection = Arrays.copyOf(selectedInd,
-							selectedInd.length + 1);
-					newSelection[newSelection.length - 1] = ++cursor;
-				} else
-				{
-					// deselect it
-					selectedInd[destInd - 1] = -1;
-					newSelection = selectedInd;
-					cursor++;
-				}
-				sngList.setSelectedIndices(newSelection);
-			} else
-				sngList.setSelectedIndex(++cursor);
-			sngList.ensureIndexIsVisible(cursor);
-		}
-	}
 
 
 	public void shuffel()
@@ -654,9 +451,6 @@ public class MainFrame extends javax.swing.JFrame
 			player.resume();
 	}
 
-
-    private void sngListFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_sngListFocusGained
-    }//GEN-LAST:event_sngListFocusGained
 
     private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
 		Application.quit();
@@ -697,6 +491,20 @@ public class MainFrame extends javax.swing.JFrame
 		else 
 			Application.quit();
     }//GEN-LAST:event_formWindowClosing
+
+    private void cbxGalleryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxGalleryActionPerformed
+		if(cbxGallery.isSelected()){
+			view = "gallery";
+			galleryPanel.setActivated(true);
+			jScrollPane.setViewportView(galleryPanel);
+			jScrollPane.validate();
+		}else{
+			view = "list";
+			galleryPanel.setActivated(false);
+			jScrollPane.setViewportView(spPanel);
+			jScrollPane.validate();
+		}
+    }//GEN-LAST:event_cbxGalleryActionPerformed
 
 
 	public void save()
@@ -773,50 +581,6 @@ public class MainFrame extends javax.swing.JFrame
 	}
 
 
-	private void showSngListPopup(MouseEvent evt)
-	{
-		int row = sngList.locationToIndex(evt.getPoint());
-		if (!sngList.isSelectedIndex(row))
-			sngList.setSelectedIndex(row);
-
-		JPopupMenu popupMenu = new JPopupMenu();
-
-		JMenuItem miRemove = new JMenuItem("Remove");
-		miRemove.addActionListener((ActionEvent ev) -> {
-			removeSelected();
-		});
-
-		JMenuItem miPlay = new JMenuItem("Play");
-		miPlay.addActionListener((ActionEvent e) -> {
-			player.play(sngList.getSelectedIndex());
-			updatePlayIcon();
-		});
-
-		popupMenu.add(miPlay);
-		popupMenu.add(miRemove);
-		popupMenu.show(sngList, evt.getX(), evt.getY());
-	}
-
-
-	private void removeSelected()
-	{
-		while (sngList.getSelectedIndex() != -1)
-		{
-			int index = sngList.getSelectedIndex();
-			if (playlist.currentSong == index)
-			{
-				player.next();
-			}
-			if (playlist.currentSong == index)
-			{
-				player.stop();
-			}
-			playlist.removeSong(index);
-			updatePlayIcon();
-		}
-	}
-
-
 	public void play()
 	{
 		switch (player.status) {
@@ -845,7 +609,7 @@ public class MainFrame extends javax.swing.JFrame
 	}
 
 
-	private void updatePlayIcon()
+	public void updatePlayIcon()
 	{
 		Runnable run = () -> {
 			switch (player.status) {
@@ -856,10 +620,12 @@ public class MainFrame extends javax.swing.JFrame
 			case SongPlayer.PAUSED -> {
 				btnPlay.setIcon(imgPlay);
 				sngTitle.setText(playlist.getCurrentSong().getTitle());
+				galleryPanel.setCurrentSong(playlist.currentSong);
 			}
 			case SongPlayer.PLAYING -> {
 				btnPlay.setIcon(imgPause);
 				sngTitle.setText(playlist.getCurrentSong().getTitle());
+				galleryPanel.setCurrentSong(playlist.currentSong);
 			}
 			default -> {
 			}
@@ -896,9 +662,30 @@ public class MainFrame extends javax.swing.JFrame
 		MainFrame.playlist = playlist;
 	}
 
-	private final PlayListListener playListListener = (int index) -> {
-		songAdded(index);
+	private final PlayListListener playListListener = new PlayListListener() {
+		@Override
+		public void sngAdded(int index)
+		{
+			songAdded(index);
+		}
+
+
+		@Override
+		public void sngRemoved(int index)
+		{
+		}
+
+
+		@Override
+		public void shuffeled()
+		{
+		}
 	};
+
+	public String getView()
+	{
+		return view;
+	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btmPanel;
@@ -914,8 +701,8 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JMenuItem btnQuit;
     private javax.swing.JMenuItem btnSave;
     private javax.swing.JMenuItem btnShuffel;
+    private javax.swing.JCheckBoxMenuItem cbxGallery;
     private javax.swing.JPanel ctrlPanel;
-    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JMenu menEdit;
     private javax.swing.JMenu menFile;
@@ -928,38 +715,8 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JLabel sngTitle;
     private javax.swing.JPanel spPanel;
     // End of variables declaration//GEN-END:variables
-	private int cursor = -1;
+	private final GalleryPanel galleryPanel;
 	private static final File metaDir = new File(
 	  System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
 
-	private boolean shiftDwn = false;
-	private boolean toPlayPause = true;
-
-	@Override
-	public void nativeKeyTyped(NativeKeyEvent nke) {
-	}
-
-	@Override
-	public void nativeKeyPressed(NativeKeyEvent nke) {
-		if (nke.getKeyCode() == NativeKeyEvent.VC_SHIFT || nke.getKeyCode() == 3638) {
-			shiftDwn = true;
-		}
-		if (nke.getKeyCode() == NativeKeyEvent.VC_PAUSE && toPlayPause) {
-			if (Settings.isPauseBtn()) {
-				play();
-			}
-			toPlayPause = false;
-		}
-	}
-
-	@Override
-	public void nativeKeyReleased(NativeKeyEvent nke) {
-		if (nke.getKeyCode() == NativeKeyEvent.VC_SHIFT || nke.getKeyCode() == 3638) {
-			shiftDwn = false;
-		}
-
-		if (nke.getKeyCode() == NativeKeyEvent.VC_PAUSE) {
-			toPlayPause = true;
-		}
-	}
 }

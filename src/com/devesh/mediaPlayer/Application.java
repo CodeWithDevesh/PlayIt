@@ -1,5 +1,6 @@
 package com.devesh.mediaPlayer;
 
+import com.devesh.mediaPlayer.Managers.NativeKeyManger;
 import com.devesh.mediaPlayer.RMI.OpenRMI;
 import com.devesh.mediaPlayer.converter.ConversionListener;
 import com.devesh.mediaPlayer.httpServer.Server;
@@ -8,6 +9,7 @@ import com.devesh.mediaPlayer.swing.Tray;
 import com.devesh.mediaPlayer.utils.Playlist;
 import com.devesh.mediaPlayer.utils.SongPlayer;
 import com.formdev.flatlaf.FlatDarkLaf;
+import java.awt.Frame;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -53,7 +55,7 @@ public class Application implements OpenRMI {
 	public static FFmpeg ffmpeg;
 	public static FFprobe ffprobe;
 
-	private static final int RMIPort = 2023, httpPort = 2021;
+	private static final int RMIPort = 2021, httpPort = 2023;
 	public static Logger logger;
 
 	private static boolean playLast = false;
@@ -137,7 +139,7 @@ public class Application implements OpenRMI {
 				natlogger.setUseParentHandlers(false);
 				GlobalScreen.setEventDispatcher(new SwingDispatchService());
 				GlobalScreen.registerNativeHook();
-				GlobalScreen.addNativeKeyListener(frame);
+				GlobalScreen.addNativeKeyListener(new NativeKeyManger());
 			} catch (NativeHookException ex)
 			{
 				logger.error(null, ex);
@@ -244,12 +246,6 @@ public class Application implements OpenRMI {
 	}
 
 
-	public static Playlist getPlaylist()
-	{
-		return playlist;
-	}
-
-
 	@Override
 	public void open(String[] args) throws RemoteException
 	{
@@ -267,6 +263,7 @@ public class Application implements OpenRMI {
 			frame.setVisible(true);
 			frame.requestFocus();
 			frame.toFront();
+			frame.setExtendedState(Frame.NORMAL);
 		}
 	}
 
@@ -284,6 +281,7 @@ public class Application implements OpenRMI {
 			frame.setVisible(true);
 			frame.requestFocus();
 			frame.toFront();
+			frame.setExtendedState(Frame.NORMAL);
 		}
 	}
 
@@ -324,5 +322,23 @@ public class Application implements OpenRMI {
 	public static Tray getTray()
 	{
 		return tray;
+	}
+
+
+	public static MainFrame getFrame()
+	{
+		return frame;
+	}
+
+
+	public static SongPlayer getPlayer()
+	{
+		return player;
+	}
+
+
+	public static Playlist getPlaylist()
+	{
+		return playlist;
 	}
 }
