@@ -21,12 +21,12 @@ public class PreferencesFrame extends javax.swing.JFrame {
 		theme = prefs.get(Settings.THEME_KEY, "Dark");
 		minOnClose = prefs.getBoolean(Settings.CLOSE_KEY, false);
 		showNotification = prefs.getBoolean(Settings.NOTIFICATION_KEY, true);
-		pauseEnbl = prefs.getBoolean(Settings.PAUSEBTN_ENABLED, true);
+		pauseEnbl = prefs.getBoolean(Settings.GLOBAL_ENABLED, true);
 
 		cbTheme.setSelectedItem(theme);
 		cbxMinmize.setSelected(minOnClose);
 		cbxNotification.setSelected(showNotification);
-		cbxPause.setSelected(pauseEnbl);
+		cbxGlobalControl.setSelected(pauseEnbl);
 	}
 
 
@@ -43,8 +43,8 @@ public class PreferencesFrame extends javax.swing.JFrame {
         cbxMinmize = new javax.swing.JCheckBox();
         lblNotification = new javax.swing.JLabel();
         cbxNotification = new javax.swing.JCheckBox();
-        lblPause = new javax.swing.JLabel();
-        cbxPause = new javax.swing.JCheckBox();
+        lblGlobalControl = new javax.swing.JLabel();
+        cbxGlobalControl = new javax.swing.JCheckBox();
         pnlSouth = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
         pnlBtn = new javax.swing.JPanel();
@@ -138,16 +138,16 @@ public class PreferencesFrame extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(8, 5, 2, 5);
         pnlMain.add(cbxNotification, gridBagConstraints);
 
-        lblPause.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
-        lblPause.setText("Play/Pause using pause button from anywhere");
+        lblGlobalControl.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
+        lblGlobalControl.setText("Enable global control");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(9, 6, 2, 6);
-        pnlMain.add(lblPause, gridBagConstraints);
+        pnlMain.add(lblGlobalControl, gridBagConstraints);
 
-        cbxPause.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        cbxGlobalControl.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -156,7 +156,7 @@ public class PreferencesFrame extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 5, 2, 5);
-        pnlMain.add(cbxPause, gridBagConstraints);
+        pnlMain.add(cbxGlobalControl, gridBagConstraints);
 
         getContentPane().add(pnlMain, java.awt.BorderLayout.PAGE_START);
 
@@ -197,7 +197,7 @@ public class PreferencesFrame extends javax.swing.JFrame {
 		prefs.put(Settings.THEME_KEY, cbTheme.getSelectedItem().toString());
 		prefs.putBoolean(Settings.CLOSE_KEY, cbxMinmize.isSelected());
 		prefs.putBoolean(Settings.NOTIFICATION_KEY, cbxNotification.isSelected());
-		prefs.putBoolean(Settings.PAUSEBTN_ENABLED, cbxPause.isSelected());
+		prefs.putBoolean(Settings.GLOBAL_ENABLED, cbxGlobalControl.isSelected());
 		
 		dispose();
     }//GEN-LAST:event_btnOKActionPerformed
@@ -206,14 +206,14 @@ public class PreferencesFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOK;
     private javax.swing.JComboBox<String> cbTheme;
+    private javax.swing.JCheckBox cbxGlobalControl;
     private javax.swing.JCheckBox cbxMinmize;
     private javax.swing.JCheckBox cbxNotification;
-    private javax.swing.JCheckBox cbxPause;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lblGlobalControl;
     private javax.swing.JLabel lblHead;
     private javax.swing.JLabel lblMinimize;
     private javax.swing.JLabel lblNotification;
-    private javax.swing.JLabel lblPause;
     private javax.swing.JLabel lblTheme;
     private javax.swing.JPanel pnlBtn;
     private javax.swing.JPanel pnlMain;

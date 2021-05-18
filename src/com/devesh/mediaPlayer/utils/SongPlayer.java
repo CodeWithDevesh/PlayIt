@@ -1,10 +1,10 @@
 package com.devesh.mediaPlayer.utils;
 
+import static com.devesh.mediaPlayer.Application.logger;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
@@ -54,22 +54,19 @@ public final class SongPlayer {
 	 * Play the current song from the <code>playlist</code>
 	 * 
 	 * @see com.devesh.mediaPlayer.SongPlayer#play(int index)
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws JavaLayerException
 	 */
-	public void play()
+	public void play() throws FileNotFoundException, JavaLayerException
 	{
 		if (status == STOPED && playlist.getCurrentSong() != null)
 		{
-			try
-			{
-				FileInputStream is = new FileInputStream(
-						playlist.getCurrentSong().getFile());
-				player = new Player(is);
-				status = PLAYING;
-				playInternal();
-			} catch (FileNotFoundException | JavaLayerException e)
-			{
-
-			}
+			FileInputStream is = new FileInputStream(
+					playlist.getCurrentSong().getFile());
+			player = new Player(is);
+			status = PLAYING;
+			playInternal();
 		}
 	}
 
@@ -79,6 +76,7 @@ public final class SongPlayer {
 	 * 
 	 * @param index
 	 *                  the song number to play. index cannot be negative.
+	 * 
 	 */
 	public void play(int index) throws IndexOutOfBoundsException
 	{
@@ -86,7 +84,17 @@ public final class SongPlayer {
 		if (!playlist.setCurrentSong(index))
 			throw new IndexOutOfBoundsException();
 		stop();
-		play();
+		try
+		{
+			play();
+		} catch (FileNotFoundException ex)
+		{
+			logger.error(null, ex);
+			handleFileNotFound();
+		} catch (JavaLayerException ex)
+		{
+			logger.error(null, ex);
+		}
 		songChanging = false;
 
 		songChangeListeners.forEach(listener -> {
@@ -176,10 +184,22 @@ public final class SongPlayer {
 	 */
 	public void next()
 	{
+		if (playlist.size() == 0)
+			return;
 		songChanging = true;
 		stop();
 		playlist.getNextSong();
-		play();
+		try
+		{
+			play();
+		} catch (FileNotFoundException ex)
+		{
+			logger.error(null, ex);
+			handleFileNotFound();
+		} catch (JavaLayerException ex)
+		{
+			logger.error(null, ex);
+		}
 		songChanging = false;
 
 		songChangeListeners.forEach(listener -> {
@@ -193,10 +213,22 @@ public final class SongPlayer {
 	 */
 	public void previous()
 	{
+		if (playlist.size() == 0)
+			return;
 		songChanging = true;
 		stop();
 		playlist.getPreSong();
-		play();
+		try
+		{
+			play();
+		} catch (FileNotFoundException ex)
+		{
+			logger.error(null, ex);
+			handleFileNotFound();
+		} catch (JavaLayerException ex)
+		{
+			logger.error(null, ex);
+		}
 		songChanging = false;
 
 		songChangeListeners.forEach(listener -> {
@@ -294,11 +326,10 @@ public final class SongPlayer {
 						* ((float) playlist.getCurrentSong().getLength()));
 				framesSkipped = toSkip;
 				player.skipMilliSeconds(toSkip);
-			} catch (JavaLayerException ex)
+			} catch (JavaLayerException | FileNotFoundException ex)
 			{
-
-				Logger.getLogger(SongPlayer.class.getName()).log(Level.SEVERE,
-						null, ex);
+				logger.error(null, ex);
+				next();
 			}
 			updatingProgress = false;
 			if (toPause)
@@ -320,7 +351,6 @@ public final class SongPlayer {
 		songChangeListeners.add(listener);
 	}
 
-	
 	/**
 	 * An interface for listening to song change events
 	 */
@@ -334,5 +364,22 @@ public final class SongPlayer {
 	public void changePlaylist(Playlist playlist)
 	{
 		this.playlist = playlist;
+	}
+
+
+	private void handleFileNotFound()
+	{
+		JOptionPane.showMessageDialog(null,
+				"Could not find "
+						+ playlist.getCurrentSong().getFile().getName(),
+				"Error", JOptionPane.ERROR_MESSAGE);
+		if (playlist.size() == 1)
+			playlist.removeSong(playlist.currentSong);
+		else
+		{
+			int x = playlist.currentSong;
+			next();
+			playlist.removeSong(x);
+		}
 	}
 }

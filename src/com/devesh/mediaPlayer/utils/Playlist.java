@@ -203,7 +203,6 @@ public class Playlist implements Serializable {
 
 	public Song getNextSong()
 	{
-
 		if (currentSong == list.size() - 1)
 			currentSong = -1;
 

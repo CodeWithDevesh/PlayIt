@@ -8,6 +8,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.FileNotFoundException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javazoom.jl.decoder.JavaLayerException;
 
 public class MainFrameManager implements KeyListener, MouseListener {
 
@@ -64,9 +68,11 @@ public class MainFrameManager implements KeyListener, MouseListener {
 			if (evt.isControlDown())
 			{
 				sngListManager.previousSong(true);
-			}else if(evt.isShiftDown()){
+			} else if (evt.isShiftDown())
+			{
 				sngListManager.moveLeft(true);
-			}else{
+			} else
+			{
 				sngListManager.moveLeft(false);
 			}
 		}
@@ -75,9 +81,11 @@ public class MainFrameManager implements KeyListener, MouseListener {
 			if (evt.isControlDown())
 			{
 				sngListManager.nextSong(true);
-			}else if(evt.isShiftDown()){
+			} else if (evt.isShiftDown())
+			{
 				sngListManager.moveRight(true);
-			}else{
+			} else
+			{
 				sngListManager.moveRight(false);
 			}
 		}
@@ -109,7 +117,21 @@ public class MainFrameManager implements KeyListener, MouseListener {
 	public void play()
 	{
 		switch (player.status) {
-		case SongPlayer.STOPED -> player.play();
+		case SongPlayer.STOPED -> {
+			try
+			{
+				player.play();
+			} catch (FileNotFoundException ex)
+			{
+				Logger.getLogger(MainFrameManager.class.getName())
+						.log(Level.SEVERE, null, ex);
+			} catch (JavaLayerException ex)
+			{
+				Logger.getLogger(MainFrameManager.class.getName())
+						.log(Level.SEVERE, null, ex);
+			}
+		}
+
 		case SongPlayer.PAUSED -> player.resume();
 		case SongPlayer.PLAYING -> player.pause();
 		default -> {

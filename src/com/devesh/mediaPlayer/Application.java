@@ -55,7 +55,7 @@ public class Application implements OpenRMI {
 	public static FFmpeg ffmpeg;
 	public static FFprobe ffprobe;
 
-	private static final int RMIPort = 2020, httpPort = 2021;
+	private static final int RMIPort = 2022, httpPort = 2021;
 	public static Logger logger;
 
 	private static boolean playLast = false;
@@ -287,17 +287,6 @@ public class Application implements OpenRMI {
 			player.play(playlist.size() - 1);
 			playLast = false;
 		}
-	}
-
-
-	public static void setPlaylist(Playlist playlist)
-	{
-		playlist.currentSong = 0;
-		player.stop();
-		Application.playlist = playlist;
-		player.changePlaylist(playlist);
-		frame.setPlaylist(playlist);
-		player.play();
 	}
 
 	public static final ConversionListener CONVERSION_LISTENER = new ConversionListener() {

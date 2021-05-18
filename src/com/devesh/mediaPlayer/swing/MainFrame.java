@@ -26,9 +26,11 @@ import java.net.URISyntaxException;
 import java.util.Scanner;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javazoom.jl.decoder.JavaLayerException;
 
 public class MainFrame extends javax.swing.JFrame
 		implements SongPlayer.SongChangeListener {
@@ -43,6 +45,7 @@ public class MainFrame extends javax.swing.JFrame
 	public static VolumeManager volManager;
 	public static SngListManager sngListManager;
 	public static MainFrameManager manager;
+	private boolean loading = false;
 
 	public MainFrame(Playlist playlist, SongPlayer player) {
 		MainFrame.playlist = playlist;
@@ -69,6 +72,9 @@ public class MainFrame extends javax.swing.JFrame
 		secTimer.start();
 
 		setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+
+		if (Settings.isGalleryView())
+			cbxGallery.doClick();
 	}
 
 
@@ -352,7 +358,7 @@ public class MainFrame extends javax.swing.JFrame
 
         setJMenuBar(menu);
 
-        setSize(new java.awt.Dimension(640, 480));
+        setSize(new java.awt.Dimension(660, 480));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -369,8 +375,12 @@ public class MainFrame extends javax.swing.JFrame
 		if (files == null)
 			return;
 		Thread openThread = new Thread(() -> {
+			loading = true;
+			File songFile;
 			for(File file : files)
 			{
+				if (!file.exists())
+					continue;
 				String filename = file.getPath();
 				if (filename.endsWith(".ppl"))
 				{
@@ -379,10 +389,16 @@ public class MainFrame extends javax.swing.JFrame
 						Scanner scanner = new Scanner(file);
 						while (scanner.hasNext())
 						{
-							playlist.addSong(
-									new Song(
-											new File(scanner.nextLine().replace(
-													"\n", ""))));
+							songFile = new File(scanner.nextLine().replace(
+									"\n", ""));
+							if (songFile.exists())
+								playlist.addSong(new Song(songFile));
+							else
+							{
+								JOptionPane.showMessageDialog(this,
+										"Could not find " + songFile.getName(),
+										"Error", JOptionPane.ERROR_MESSAGE);
+							}
 						}
 					} catch (InvalidDataException | IOException ex)
 					{
@@ -396,13 +412,15 @@ public class MainFrame extends javax.swing.JFrame
 					} catch (InvalidDataException | IOException ex)
 					{
 						logger.error(
-								"Error while opening file: " + file.getPath(),
+								"Error while opening file: "
+										+ file.getPath(),
 								ex);
 					}
 				}
 			}
 			Application.opened();
 			updatePlayIcon();
+			loading = false;
 		});
 		openThread.start();
 	}
@@ -446,7 +464,8 @@ public class MainFrame extends javax.swing.JFrame
 			player.pause();
 			paused = true;
 		}
-		playlist.shuffel();
+		if (playlist.size() > 0)
+			playlist.shuffel();
 		if (paused)
 			player.resume();
 	}
@@ -493,17 +512,26 @@ public class MainFrame extends javax.swing.JFrame
     }//GEN-LAST:event_formWindowClosing
 
     private void cbxGalleryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxGalleryActionPerformed
-		if(cbxGallery.isSelected()){
-			view = "gallery";
-			galleryPanel.setActivated(true);
-			jScrollPane.setViewportView(galleryPanel);
-			jScrollPane.validate();
-		}else{
-			view = "list";
-			galleryPanel.setActivated(false);
-			jScrollPane.setViewportView(spPanel);
-			jScrollPane.validate();
-		}
+		Thread thread = new Thread(() -> {
+			while(loading)
+				logger.info("waiting for loading to complete");
+			SwingUtilities.invokeLater(() -> {
+				if(cbxGallery.isSelected()){
+					view = "gallery";
+					galleryPanel.setActivated(true);
+					jScrollPane.setViewportView(galleryPanel);
+					jScrollPane.validate();
+					Settings.setGalleryView(true);
+				}else{
+					view = "list";
+					galleryPanel.setActivated(false);
+					jScrollPane.setViewportView(spPanel);
+					jScrollPane.validate();
+					Settings.setGalleryView(false);
+				}
+			});
+		});
+		thread.start();
     }//GEN-LAST:event_cbxGalleryActionPerformed
 
 
@@ -584,7 +612,19 @@ public class MainFrame extends javax.swing.JFrame
 	public void play()
 	{
 		switch (player.status) {
-		case SongPlayer.STOPED -> player.play();
+		case SongPlayer.STOPED -> {
+			try
+			{
+				player.play();
+			} catch (FileNotFoundException ex)
+			{
+				logger.error(null, ex);
+			} catch (JavaLayerException ex)
+			{
+				logger.error(null, ex);
+			}
+		}
+
 		case SongPlayer.PAUSED -> player.resume();
 		case SongPlayer.PLAYING -> player.pause();
 		default -> {
