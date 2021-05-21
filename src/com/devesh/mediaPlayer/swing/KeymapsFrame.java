@@ -47,6 +47,7 @@ public class KeymapsFrame extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(panel);
 
+        jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         setSize(new java.awt.Dimension(416, 338));

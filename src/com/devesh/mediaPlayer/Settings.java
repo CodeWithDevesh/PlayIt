@@ -7,7 +7,8 @@ public class Settings {
 	public static String THEME_KEY = "THEME";
 	public static String CLOSE_KEY = "CLOSE_METHOD";
 	public static String NOTIFICATION_KEY = "SHOW_NOTIFICATION";
-	public static String GLOBAL_ENABLED = "PAUSEBTN_ENABLSED";
+	public static String GLOBAL_ENABLED_KEY = "PAUSEBTN_ENABLSED";
+	public static String DOWNLOAD_LINK_KEY = "DOWNLOAD_LINK";
 	public static String VIEW = "VIEW";
 
 	private static boolean showNotification;
@@ -15,6 +16,7 @@ public class Settings {
 	private static String theme;
 	private static boolean globalControl;
 	private static boolean isGalleryView;
+	private static String downloadLink;
 
 	public static void init()
 	{
@@ -22,9 +24,6 @@ public class Settings {
 			loadSettings();
 		});
 		theme = prefs.get(THEME_KEY, "Dark");
-		minOnClose = prefs.getBoolean(CLOSE_KEY, false);
-		showNotification = prefs.getBoolean(NOTIFICATION_KEY, true);
-		globalControl = prefs.getBoolean(GLOBAL_ENABLED, true);
 		loadSettings();
 	}
 
@@ -33,8 +32,10 @@ public class Settings {
 	{
 		minOnClose = prefs.getBoolean(CLOSE_KEY, false);
 		showNotification = prefs.getBoolean(NOTIFICATION_KEY, true);
-		globalControl = prefs.getBoolean(GLOBAL_ENABLED, true);
+		globalControl = prefs.getBoolean(GLOBAL_ENABLED_KEY, true);
 		isGalleryView = prefs.getBoolean(VIEW, true);
+		downloadLink = prefs.get(DOWNLOAD_LINK_KEY,
+				"https://ytmdl.deepjyoti30.dev/search");
 	}
 
 
@@ -54,17 +55,30 @@ public class Settings {
 	{
 		return theme;
 	}
-	
-	public static boolean isGlobalCtrlEnabled(){
+
+
+	public static boolean isGlobalCtrlEnabled()
+	{
 		return globalControl;
 	}
 
-	public static boolean isGalleryView() {
+
+	public static boolean isGalleryView()
+	{
 		return isGalleryView;
 	}
 
-	public static void setGalleryView(boolean isGalleryView) {
+
+	public static void setGalleryView(boolean isGalleryView)
+	{
 		Settings.isGalleryView = isGalleryView;
 		prefs.putBoolean(VIEW, isGalleryView);
 	}
+
+
+	public static String getDownloadLink()
+	{
+		return downloadLink;
+	}
+
 }

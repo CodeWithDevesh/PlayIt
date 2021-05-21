@@ -522,11 +522,14 @@ public class MainFrame extends javax.swing.JFrame
 		try 
 		{
 			Desktop desktop = Desktop.getDesktop();
-			logger.info("redirecting to https://ytmdl.deepjyoti30.dev/search");
-			desktop.browse(new URI("https://ytmdl.deepjyoti30.dev/search"));
+			logger.info("redirecting to " + Settings.getDownloadLink());
+			desktop.browse(new URI(Settings.getDownloadLink()));
 		} catch (URISyntaxException | IOException ex) 
 		{
 			logger.error("Exception while redirecting", ex);
+			JOptionPane.showMessageDialog(this, 
+				 "Error while redirecting, check the url in prefs", 
+					null, JOptionPane.ERROR_MESSAGE);
 		}
     }//GEN-LAST:event_btnDownloadActionPerformed
 
@@ -688,7 +691,7 @@ public class MainFrame extends javax.swing.JFrame
 			if (player.status == SongPlayer.PLAYING)
 			{
 				lblCompInfo.setText(getTimeString(player.getProgressMillis()));
-			} else if(player.status == SongPlayer.STOPED)
+			} else if (player.status == SongPlayer.STOPED)
 			{
 				lblCompInfo.setText("00:00");
 				lblTtlTime.setText("00:00");
@@ -825,5 +828,5 @@ public class MainFrame extends javax.swing.JFrame
 	private final GalleryPanel galleryPanel;
 	private static final File metaDir = new File(
 	  System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
-	
+
 }

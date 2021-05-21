@@ -9,6 +9,7 @@ public class PreferencesFrame extends javax.swing.JFrame {
 	private boolean minOnClose;
 	private String theme;
 	private boolean pauseEnbl;
+	private String downloadLink;
 
 	public PreferencesFrame() {
 		initComponents();
@@ -21,12 +22,14 @@ public class PreferencesFrame extends javax.swing.JFrame {
 		theme = prefs.get(Settings.THEME_KEY, "Dark");
 		minOnClose = prefs.getBoolean(Settings.CLOSE_KEY, false);
 		showNotification = prefs.getBoolean(Settings.NOTIFICATION_KEY, true);
-		pauseEnbl = prefs.getBoolean(Settings.GLOBAL_ENABLED, true);
+		pauseEnbl = prefs.getBoolean(Settings.GLOBAL_ENABLED_KEY, true);
+		downloadLink = prefs.get(Settings.DOWNLOAD_LINK_KEY, "https://ytmdl.deepjyoti30.dev/search");
 
 		cbTheme.setSelectedItem(theme);
 		cbxMinmize.setSelected(minOnClose);
 		cbxNotification.setSelected(showNotification);
 		cbxGlobalControl.setSelected(pauseEnbl);
+		tfDownload.setText(downloadLink);
 	}
 
 
@@ -45,6 +48,8 @@ public class PreferencesFrame extends javax.swing.JFrame {
         cbxNotification = new javax.swing.JCheckBox();
         lblGlobalControl = new javax.swing.JLabel();
         cbxGlobalControl = new javax.swing.JCheckBox();
+        lblDownload = new javax.swing.JLabel();
+        tfDownload = new javax.swing.JTextField();
         pnlSouth = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
         pnlBtn = new javax.swing.JPanel();
@@ -158,6 +163,23 @@ public class PreferencesFrame extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(8, 5, 2, 5);
         pnlMain.add(cbxGlobalControl, gridBagConstraints);
 
+        lblDownload.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
+        lblDownload.setText("Song Download Link");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(9, 6, 2, 6);
+        pnlMain.add(lblDownload, gridBagConstraints);
+
+        tfDownload.setText("https://ytmdl.deepjyoti30.dev/search");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 2, 5);
+        pnlMain.add(tfDownload, gridBagConstraints);
+
         getContentPane().add(pnlMain, java.awt.BorderLayout.PAGE_START);
 
         pnlSouth.setLayout(new java.awt.BorderLayout());
@@ -197,7 +219,8 @@ public class PreferencesFrame extends javax.swing.JFrame {
 		prefs.put(Settings.THEME_KEY, cbTheme.getSelectedItem().toString());
 		prefs.putBoolean(Settings.CLOSE_KEY, cbxMinmize.isSelected());
 		prefs.putBoolean(Settings.NOTIFICATION_KEY, cbxNotification.isSelected());
-		prefs.putBoolean(Settings.GLOBAL_ENABLED, cbxGlobalControl.isSelected());
+		prefs.putBoolean(Settings.GLOBAL_ENABLED_KEY, cbxGlobalControl.isSelected());
+		prefs.put(Settings.DOWNLOAD_LINK_KEY, tfDownload.getText());
 		
 		dispose();
     }//GEN-LAST:event_btnOKActionPerformed
@@ -210,6 +233,7 @@ public class PreferencesFrame extends javax.swing.JFrame {
     private javax.swing.JCheckBox cbxMinmize;
     private javax.swing.JCheckBox cbxNotification;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lblDownload;
     private javax.swing.JLabel lblGlobalControl;
     private javax.swing.JLabel lblHead;
     private javax.swing.JLabel lblMinimize;
@@ -218,5 +242,6 @@ public class PreferencesFrame extends javax.swing.JFrame {
     private javax.swing.JPanel pnlBtn;
     private javax.swing.JPanel pnlMain;
     private javax.swing.JPanel pnlSouth;
+    private javax.swing.JTextField tfDownload;
     // End of variables declaration//GEN-END:variables
 }
