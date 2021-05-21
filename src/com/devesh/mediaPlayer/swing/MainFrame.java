@@ -117,6 +117,8 @@ public class MainFrame extends javax.swing.JFrame
         menTools = new javax.swing.JMenu();
         btnDownload = new javax.swing.JMenuItem();
         btnConverter = new javax.swing.JMenuItem();
+        menHelp = new javax.swing.JMenu();
+        btnHelKey = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("PlayIt Music Player");
@@ -374,6 +376,20 @@ public class MainFrame extends javax.swing.JFrame
 
         menu.add(menTools);
 
+        menHelp.setText("Help");
+
+        btnHelKey.setText("Keymaps");
+        btnHelKey.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnHelKey.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnHelKey.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHelKeyActionPerformed(evt);
+            }
+        });
+        menHelp.add(btnHelKey);
+
+        menu.add(menHelp);
+
         setJMenuBar(menu);
 
         setSize(new java.awt.Dimension(660, 480));
@@ -551,6 +567,10 @@ public class MainFrame extends javax.swing.JFrame
 		});
 		thread.start();
     }//GEN-LAST:event_cbxGalleryActionPerformed
+
+    private void btnHelKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHelKeyActionPerformed
+		new KeymapsFrame().setVisible(true);
+    }//GEN-LAST:event_btnHelKeyActionPerformed
 
 
 	public void save()
@@ -775,6 +795,7 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JMenuItem btnAutostart;
     private javax.swing.JMenuItem btnConverter;
     private javax.swing.JMenuItem btnDownload;
+    private javax.swing.JMenuItem btnHelKey;
     private javax.swing.JButton btnNext;
     private javax.swing.JMenuItem btnOpn;
     private javax.swing.JPanel btnPanel;
@@ -791,6 +812,7 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JLabel lblTtlTime;
     private javax.swing.JMenu menEdit;
     private javax.swing.JMenu menFile;
+    private javax.swing.JMenu menHelp;
     private javax.swing.JMenu menTools;
     private javax.swing.JMenu menView;
     private javax.swing.JMenuBar menu;
