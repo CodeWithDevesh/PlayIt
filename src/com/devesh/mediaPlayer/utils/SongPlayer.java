@@ -299,6 +299,14 @@ public final class SongPlayer {
 	}
 
 
+	public int getProgressMillis()
+	{
+		if (player != null && playlist.getCurrentSong() != null)
+			return player.getPosition() + framesSkipped;
+		return 0;
+	}
+
+
 	/**
 	 * set the progress in percentage
 	 * 

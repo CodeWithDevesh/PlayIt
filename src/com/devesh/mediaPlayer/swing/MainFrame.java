@@ -96,8 +96,10 @@ public class MainFrame extends javax.swing.JFrame
         btnPre = new javax.swing.JButton();
         btnPlay = new javax.swing.JButton();
         btnNext = new javax.swing.JButton();
+        lblCompInfo = new javax.swing.JLabel();
         progressBar = new javax.swing.JSlider();
         sldVolume = volManager.getSlider();
+        lblTtlTime = new javax.swing.JLabel();
         jScrollPane = new javax.swing.JScrollPane();
         spPanel = new javax.swing.JPanel();
         sngList = sngListManager.GetList();
@@ -180,6 +182,11 @@ public class MainFrame extends javax.swing.JFrame
 
         ctrlPanel.add(btnPanel, new java.awt.GridBagConstraints());
 
+        lblCompInfo.setText("00:00");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 5);
+        ctrlPanel.add(lblCompInfo, gridBagConstraints);
+
         progressBar.setToolTipText("Progress");
         progressBar.setValue(0);
         progressBar.setBorder(null);
@@ -194,6 +201,8 @@ public class MainFrame extends javax.swing.JFrame
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 10.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
@@ -206,10 +215,19 @@ public class MainFrame extends javax.swing.JFrame
         sldVolume.setFocusable(false);
         sldVolume.setPreferredSize(new java.awt.Dimension(51, 21));
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         ctrlPanel.add(sldVolume, gridBagConstraints);
+
+        lblTtlTime.setText("00:00");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 9);
+        ctrlPanel.add(lblTtlTime, gridBagConstraints);
 
         btmPanel.add(ctrlPanel);
 
@@ -616,10 +634,7 @@ public class MainFrame extends javax.swing.JFrame
 			try
 			{
 				player.play();
-			} catch (FileNotFoundException ex)
-			{
-				logger.error(null, ex);
-			} catch (JavaLayerException ex)
+			} catch (FileNotFoundException | JavaLayerException ex)
 			{
 				logger.error(null, ex);
 			}
@@ -638,6 +653,8 @@ public class MainFrame extends javax.swing.JFrame
 	public void songChanged()
 	{
 		sngList.repaint();
+		lblTtlTime
+				.setText(getTimeString(playlist.getCurrentSong().getLength()));
 		updatePlayIcon();
 	}
 
@@ -646,6 +663,17 @@ public class MainFrame extends javax.swing.JFrame
 	{
 		if (!pbChange && player != null && isVisible())
 			progressBar.setValue(player.getProgressPercentage());
+		if (isVisible())
+		{
+			if (player.status == SongPlayer.PLAYING)
+			{
+				lblCompInfo.setText(getTimeString(player.getProgressMillis()));
+			} else if(player.status == SongPlayer.STOPED)
+			{
+				lblCompInfo.setText("00:00");
+				lblTtlTime.setText("00:00");
+			}
+		}
 	}
 
 
@@ -727,6 +755,21 @@ public class MainFrame extends javax.swing.JFrame
 		return view;
 	}
 
+
+	private String getTimeString(int millis)
+	{
+		int sec, min, hour;
+		hour = millis / 3600000;
+		millis = millis % 3600000;
+		min = millis / 60000;
+		millis = millis % 60000;
+		sec = millis / 1000;
+		if (hour > 0)
+			return String.format("%02d:%02d:%02d", hour, min, sec);
+		else
+			return String.format("%02d:%02d", min, sec);
+	}
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btmPanel;
     private javax.swing.JMenuItem btnAutostart;
@@ -744,6 +787,8 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JCheckBoxMenuItem cbxGallery;
     private javax.swing.JPanel ctrlPanel;
     private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JLabel lblCompInfo;
+    private javax.swing.JLabel lblTtlTime;
     private javax.swing.JMenu menEdit;
     private javax.swing.JMenu menFile;
     private javax.swing.JMenu menTools;
@@ -758,5 +803,5 @@ public class MainFrame extends javax.swing.JFrame
 	private final GalleryPanel galleryPanel;
 	private static final File metaDir = new File(
 	  System.getProperty("user.home") + "\\appdata\\local\\PlayIt");
-
+	
 }
