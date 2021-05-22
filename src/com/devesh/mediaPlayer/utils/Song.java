@@ -87,7 +87,7 @@ public class Song implements Serializable {
 
 			if (!"mp3".equals(format.format_name))
 			{
-				int x = JOptionPane.showConfirmDialog(null,
+				int x = JOptionPane.showConfirmDialog(Application.getFrame(),
 						title + " has invalid format. Would you like playit to automatically convert it to mp3",
 						null, JOptionPane.YES_NO_OPTION,
 						JOptionPane.ERROR_MESSAGE);

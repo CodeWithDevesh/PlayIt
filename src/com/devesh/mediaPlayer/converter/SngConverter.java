@@ -37,6 +37,7 @@ public class SngConverter {
 			FFmpegBuilder builder = new FFmpegBuilder()
 					.addInput(in)
 					.addOutput(out).addMetaTag("title", title)
+					.setAudioBitRate(320000)
 					.done();
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 

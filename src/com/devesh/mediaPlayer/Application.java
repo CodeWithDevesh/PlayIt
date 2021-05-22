@@ -284,7 +284,8 @@ public class Application implements OpenRMI {
 	{
 		if (playLast)
 		{
-			player.play(playlist.size() - 1);
+			if (playlist.size() != 0)
+				player.play(playlist.size() - 1);
 			playLast = false;
 		}
 	}
