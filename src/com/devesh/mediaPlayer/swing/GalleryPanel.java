@@ -8,6 +8,8 @@ import com.devesh.mediaPlayer.utils.SongPlayer;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import java.util.TreeSet;
 import javax.swing.JPanel;
 
 public class GalleryPanel extends JPanel implements PlayListListener,
-		MouseListener {
+		MouseListener, DragGestureListener {
 
 	private final Playlist playlist;
 	private final ArrayList<GalleryLabel> lables;
@@ -442,6 +444,11 @@ public class GalleryPanel extends JPanel implements PlayListListener,
 	{
 		calculate();
 		setCurrentSong(playlist.currentSong);
+	}
+
+	@Override
+	public void dragGestureRecognized(DragGestureEvent dge) {
+		
 	}
 
 	public interface GalleryListener {

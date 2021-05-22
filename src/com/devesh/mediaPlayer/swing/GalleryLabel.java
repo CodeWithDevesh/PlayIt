@@ -19,7 +19,7 @@ public class GalleryLabel extends JComponent implements MouseListener {
 	private boolean isPlaying = false;
 
 	private final JLabel txtLabel, imgLabel;
-	private final ImageIcon icon, icon2;
+	private final ImageIcon iconSmall, icon;
 
 	public GalleryLabel(String text, ImageIcon icon, Dimension size) {
 		super();
@@ -27,17 +27,17 @@ public class GalleryLabel extends JComponent implements MouseListener {
 		setToolTipText(text);
 		setLayout(new BorderLayout());
 
-		this.icon2 = new ImageIcon(
+		this.icon = new ImageIcon(
 				icon.getImage().getScaledInstance(size.width - 20,
 						size.height - 20, Image.SCALE_FAST));
-		this.icon = new ImageIcon(
+		this.iconSmall = new ImageIcon(
 				icon.getImage().getScaledInstance(size.width - 60,
 						size.height - 60, Image.SCALE_FAST));
 
 		txtLabel = new JLabel(text);
 		txtLabel.setHorizontalAlignment(JLabel.CENTER);
 
-		imgLabel = new JLabel(this.icon);
+		imgLabel = new JLabel(this.iconSmall);
 
 		add(imgLabel, BorderLayout.CENTER);
 		add(txtLabel, BorderLayout.SOUTH);
@@ -97,7 +97,7 @@ public class GalleryLabel extends JComponent implements MouseListener {
 	@Override
 	public void mouseEntered(MouseEvent e)
 	{
-		imgLabel.setIcon(icon2);
+		imgLabel.setIcon(icon);
 		repaint();
 	}
 
@@ -105,7 +105,7 @@ public class GalleryLabel extends JComponent implements MouseListener {
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		imgLabel.setIcon(icon);
+		imgLabel.setIcon(iconSmall);
 		repaint();
 	}
 
@@ -133,5 +133,9 @@ public class GalleryLabel extends JComponent implements MouseListener {
 	public boolean isPlaying()
 	{
 		return isPlaying;
+	}
+
+	public ImageIcon getIcon() {
+		return icon;
 	}
 }

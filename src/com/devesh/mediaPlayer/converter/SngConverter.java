@@ -35,31 +35,47 @@ public class SngConverter {
 			}
 
 			FFmpegBuilder builder = new FFmpegBuilder()
-			  .addInput(in)
-			  .addOutput(out).addMetaTag("title", title)
-			  .done();
+					.addInput(in)
+					.addOutput(out).addMetaTag("title", title)
+					.done();
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 
-			progressMonitor = new ProgressMonitor(null,
+			progressMonitor = new ProgressMonitor(Application.getFrame(),
 					"Converting your file...", null, 0, 100);
 
-			FFmpegJob job = executor.createJob(builder, new ProgressListener() {
-
-				final double duration_ns = in.getFormat().duration
-						* TimeUnit.SECONDS.toNanos(1);
-
-				@Override
-				public void progress(Progress progress)
-				{
-					double percentage = progress.out_time_ns
-							/ duration_ns;
-					progressMonitor.setProgress(
-							(int) Math.min(percentage * 100, 100));
-				}
-			});
 			Thread thread = new Thread(() -> {
 				try
 				{
+					FFmpegJob job = executor.createJob(builder,
+							new ProgressListener() {
+
+								final double duration_ns = in
+										.getFormat().duration
+										* TimeUnit.SECONDS.toNanos(1);
+
+								@Override
+								public void progress(Progress progress)
+								{
+									if (progressMonitor.isCanceled())
+									{
+										try
+										{
+											if (listener != null)
+												listener.stoped(false,
+														null);
+											Thread.currentThread().join();
+										} catch (InterruptedException ex)
+										{
+											logger.error(null, ex);
+										}
+									}
+									double percentage = progress.out_time_ns
+											/ duration_ns;
+									progressMonitor.setProgress(
+											(int) Math.min(percentage * 100,
+													100));
+								}
+							});
 					job.run();
 				} catch (Exception ex)
 				{
@@ -74,6 +90,7 @@ public class SngConverter {
 				if (listener != null)
 					listener.stoped(true, new File(out));
 			});
+
 			thread.start();
 		} catch (Exception ex)
 		{
@@ -112,25 +129,37 @@ public class SngConverter {
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 			progressMonitor = new ProgressMonitor(Application.getFrame(),
 					"Converting your file...", null, 0, 100);
-			FFmpegJob job = executor.createJob(builder,
-					new ProgressListener() {
-						final double duration_ns = ffprobe
-								.probe(in.getPath())
-								.getFormat().duration
-								* TimeUnit.SECONDS.toNanos(1);
 
-						@Override
-						public void progress(Progress progress)
-						{
-							double percentage = progress.out_time_ns
-									/ duration_ns;
-							progressMonitor.setProgress(
-									(int) Math.min(percentage * 100, 100));
-						}
-					});
 			Thread thread = new Thread(() -> {
 				try
 				{
+					FFmpegJob job = executor.createJob(builder,
+							new ProgressListener() {
+								final double duration_ns = ffprobe
+										.probe(in.getPath())
+										.getFormat().duration
+										* TimeUnit.SECONDS.toNanos(1);
+
+								@Override
+								public void progress(Progress progress)
+								{
+									if (progressMonitor.isCanceled())
+									{
+										try
+										{
+											Thread.currentThread().join();
+										} catch (InterruptedException ex)
+										{
+											logger.error(null, ex);
+										}
+									}
+									double percentage = progress.out_time_ns
+											/ duration_ns;
+									progressMonitor.setProgress(
+											(int) Math.min(percentage * 100,
+													100));
+								}
+							});
 					job.run();
 				} catch (Exception ex)
 				{

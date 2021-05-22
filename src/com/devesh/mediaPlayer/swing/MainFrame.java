@@ -677,7 +677,7 @@ public class MainFrame extends javax.swing.JFrame
 	{
 		sngList.repaint();
 		lblTtlTime
-				.setText(getTimeString(playlist.getCurrentSong().getLength()));
+				.setText(getTimeString(playlist.getCurrentSong().getLength() * 1000));
 		updatePlayIcon();
 	}
 
@@ -779,9 +779,9 @@ public class MainFrame extends javax.swing.JFrame
 	}
 
 
-	private String getTimeString(int millis)
+	private String getTimeString(long millis)
 	{
-		int sec, min, hour;
+		long sec, min, hour;
 		hour = millis / 3600000;
 		millis = millis % 3600000;
 		min = millis / 60000;

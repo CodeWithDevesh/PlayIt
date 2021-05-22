@@ -290,9 +290,9 @@ public final class SongPlayer {
 	{
 		if (player != null && playlist.getCurrentSong() != null)
 		{
-			float a = player.getPosition() + framesSkipped;
-			float b = playlist.getCurrentSong().getLength();
-			float i = (a / b) * 100;
+			double a = player.getPosition() + framesSkipped;
+			double b = playlist.getCurrentSong().getLength() * 1000;
+			double i = (a / b) * 100;
 			return (int) i;
 		}
 		return 0;
@@ -331,7 +331,7 @@ public final class SongPlayer {
 				play();
 				float percentage = ((float) progress) / 100f;
 				int toSkip = (int) (percentage
-						* ((float) playlist.getCurrentSong().getLength()));
+						* ((float) playlist.getCurrentSong().getLength() * 1000));
 				framesSkipped = toSkip;
 				player.skipMilliSeconds(toSkip);
 			} catch (JavaLayerException | FileNotFoundException ex)

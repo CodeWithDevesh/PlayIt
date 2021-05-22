@@ -22,7 +22,7 @@ public class Song implements Serializable {
 	private final File file;
 	private String title = null;
 	private final ImageIcon image;
-	private int length;
+	private long length;
 	private transient FFmpeg ffmpeg = Application.ffmpeg;
 	private transient FFprobe ffprobe = Application.ffprobe;
 	private byte[] imageData = null;
@@ -35,7 +35,9 @@ public class Song implements Serializable {
 		try
 		{
 			mp3File = new Mp3File(file);
-			length = (int) mp3File.getLengthInMilliseconds();
+			length = mp3File.getLengthInSeconds();
+			if(length < 0)
+				throw new InvalidDataException();
 			if (!mp3File.hasId3v1Tag() && !mp3File.hasId3v2Tag())
 				throw new InvalidDataException();
 			if (mp3File.hasId3v2Tag())
@@ -70,7 +72,7 @@ public class Song implements Serializable {
 			FFmpegProbeResult result = ffprobe.probe(file.getPath());
 			FFmpegFormat format = result.getFormat();
 
-			length = (int) format.duration * 1000;
+			length = (long) format.duration;
 			if (format.tags != null)
 				title = format.tags.get("title");
 			if (title == null || title.isBlank())
@@ -136,7 +138,7 @@ public class Song implements Serializable {
 	}
 
 
-	public int getLength()
+	public long getLength()
 	{
 		return length;
 	}
