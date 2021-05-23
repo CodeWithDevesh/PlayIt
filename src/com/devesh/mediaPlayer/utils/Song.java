@@ -5,7 +5,6 @@ import static com.devesh.mediaPlayer.Application.logger;
 import com.devesh.mediaPlayer.converter.SngConverter;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
-import com.mpatric.mp3agic.UnsupportedTagException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -34,6 +33,8 @@ public class Song implements Serializable {
 		Mp3File mp3File;
 		try
 		{
+			if(file.length() > 1048576 * 500)
+				throw new InvalidDataException("File size more than 500 mb");
 			mp3File = new Mp3File(file);
 			length = mp3File.getLengthInSeconds();
 			if(length < 0)
@@ -57,8 +58,7 @@ public class Song implements Serializable {
 							title.length() - ("mp3".length() + 1));
 				}
 			}
-		} catch (InvalidDataException | IOException
-				| UnsupportedTagException ex)
+		} catch (Exception ex)
 		{
 			title = null;
 			logger.error(null, ex);
@@ -104,7 +104,7 @@ public class Song implements Serializable {
 					{
 						String out = fileChooser.getSelectedFile().getPath()
 								+ "\\" + title + ".mp3";
-						SngConverter.autoConvert(result, out,
+						new SngConverter().autoConvert(result, out,
 								Application.CONVERSION_LISTENER, title);
 						throw new InvalidDataException();
 					} else

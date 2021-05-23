@@ -18,22 +18,29 @@ import org.slf4j.Logger;
 
 public class SngConverter {
 
-	private static FFmpeg ffmpeg = Application.ffmpeg;
-	private static FFprobe ffprobe = Application.ffprobe;
+	FFmpeg ffmpeg;
+	FFprobe ffprobe;
 	private static final Logger logger = Application.logger;
-	private static ProgressMonitor progressMonitor;
+	private boolean canceled = false;
 
-	public static void autoConvert(FFmpegProbeResult in, String out,
-			ConversionListener listener, String title)
-	{
+	public SngConverter() {
 		try
 		{
-			if (ffmpeg == null || ffprobe == null)
-			{
-				ffmpeg = new FFmpeg("ffmpeg.exe");
-				ffprobe = new FFprobe("ffprobe.exe");
-			}
+			ffmpeg = new FFmpeg("ffmpeg.exe");
+			ffprobe = new FFprobe("ffprobe.exe");
+		} catch (IOException ex)
+		{
+			logger.error(null, ex);
+		}
+	}
 
+
+	public void autoConvert(FFmpegProbeResult in, String out,
+			ConversionListener listener, String title)
+	{
+		setCanceled(false);
+		try
+		{
 			FFmpegBuilder builder = new FFmpegBuilder()
 					.addInput(in)
 					.addOutput(out).addMetaTag("title", title)
@@ -41,9 +48,9 @@ public class SngConverter {
 					.done();
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 
-			progressMonitor = new ProgressMonitor(Application.getFrame(),
+			ProgressMonitor progressMonitor = new ProgressMonitor(
+					Application.getFrame(),
 					"Converting your file...", null, 0, 100);
-
 			Thread thread = new Thread(() -> {
 				try
 				{
@@ -61,11 +68,9 @@ public class SngConverter {
 									{
 										try
 										{
-											if (listener != null)
-												listener.stoped(false,
-														null);
-											Thread.currentThread().join();
-										} catch (InterruptedException ex)
+											setCanceled(true);
+											ffmpeg.getProcess().destroy();
+										} catch (Exception ex)
 										{
 											logger.error(null, ex);
 										}
@@ -81,14 +86,17 @@ public class SngConverter {
 				} catch (Exception ex)
 				{
 					logger.error("Error while converting", ex);
-					if (listener != null)
-						listener.stoped(false, null);
-					JOptionPane.showMessageDialog(null,
-							"An error occured while converting your file",
-							"Error", JOptionPane.OK_OPTION);
+					if (!canceled)
+					{
+						if (listener != null)
+							listener.stoped(false, null);
+						JOptionPane.showMessageDialog(null,
+								"An error occured while converting your file",
+								"Error", JOptionPane.OK_OPTION);
+					}
 				}
 				progressMonitor.close();
-				if (listener != null)
+				if (listener != null && !canceled)
 					listener.stoped(true, new File(out));
 			});
 
@@ -105,30 +113,19 @@ public class SngConverter {
 	}
 
 
-	public static void convert(File in, File out, String title)
+	public void convert(File in, File out, String title)
 	{
-		if (ffmpeg == null || ffprobe == null)
-		{
-			try
-			{
-				ffmpeg = new FFmpeg("ffmpeg.exe");
-				ffprobe = new FFprobe("ffprobe.exe");
-			} catch (IOException ex)
-			{
-				logger.error(null, ex);
-			}
-		}
+		setCanceled(false);
 		try
 		{
-			ffmpeg = new FFmpeg("ffmpeg.exe");
-			ffprobe = new FFprobe("ffprobe.exe");
 			FFmpegBuilder builder = new FFmpegBuilder()
 					.addInput(in.getPath())
 					.addOutput(out.getPath()).addMetaTag("title", title)
 					.setAudioBitRate(320000)
 					.done();
 			FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-			progressMonitor = new ProgressMonitor(Application.getFrame(),
+			ProgressMonitor progressMonitor = new ProgressMonitor(
+					Application.getFrame(),
 					"Converting your file...", null, 0, 100);
 
 			Thread thread = new Thread(() -> {
@@ -148,8 +145,9 @@ public class SngConverter {
 									{
 										try
 										{
-											Thread.currentThread().join();
-										} catch (InterruptedException ex)
+											setCanceled(true);
+											ffmpeg.getProcess().destroy();
+										} catch (Exception ex)
 										{
 											logger.error(null, ex);
 										}
@@ -165,19 +163,26 @@ public class SngConverter {
 				} catch (Exception ex)
 				{
 					logger.error("Error while converting", ex);
-					JOptionPane.showMessageDialog(null,
-							"An error occured while converting your file",
-							"Error", JOptionPane.OK_OPTION);
+					if (!canceled)
+						JOptionPane.showMessageDialog(null,
+								"An error occured while converting your file",
+								"Error", JOptionPane.OK_OPTION);
 				}
 				progressMonitor.close();
 			});
 			thread.start();
-		} catch (IOException ex)
+		} catch (Exception ex)
 		{
 			logger.error("Error while converting", ex);
 			JOptionPane.showMessageDialog(null,
 					"An error occured while converting your file",
 					"Error", JOptionPane.OK_OPTION);
 		}
+	}
+
+
+	private void setCanceled(boolean canceled)
+	{
+		this.canceled = canceled;
 	}
 }

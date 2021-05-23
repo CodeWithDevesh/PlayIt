@@ -566,6 +566,7 @@ public class MainFrame extends javax.swing.JFrame
 					jScrollPane.validate();
 					Settings.setGalleryView(false);
 				}
+				System.gc();
 			});
 		});
 		thread.start();

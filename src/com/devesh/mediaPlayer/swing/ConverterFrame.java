@@ -289,7 +289,7 @@ public class ConverterFrame extends javax.swing.JFrame {
 			lblMessage.setText("Enter valid output directory");
 			return;
 		}
-		SngConverter.convert(input, output, title);
+		new SngConverter().convert(input, output, title);
 		
 		lblMessage.setText("");
     }//GEN-LAST:event_btnConvertActionPerformed

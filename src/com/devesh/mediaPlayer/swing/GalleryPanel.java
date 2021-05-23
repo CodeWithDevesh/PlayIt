@@ -10,6 +10,11 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -17,9 +22,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 public class GalleryPanel extends JPanel implements PlayListListener,
-		MouseListener, DragGestureListener {
+		MouseListener, DragGestureListener, DropTargetListener {
 
 	private final Playlist playlist;
 	private final ArrayList<GalleryLabel> lables;
@@ -28,6 +34,10 @@ public class GalleryPanel extends JPanel implements PlayListListener,
 	private boolean isActivated = false;
 	private final LinkedList<GalleryListener> listeners;
 	private int cursor = -1;
+	private final JSeparator separator = new JSeparator(JSeparator.VERTICAL);
+	
+	//used to determine if the jseprator is already added or not
+	private boolean sepAdded;
 
 	public GalleryPanel(Playlist playlist, SongPlayer player) {
 		this.playlist = playlist;
@@ -35,7 +45,11 @@ public class GalleryPanel extends JPanel implements PlayListListener,
 		lables = new ArrayList<>();
 		listeners = new LinkedList<>();
 		setLayout(layout);
-
+		separator.setPreferredSize(new Dimension(20, 200));
+		
+		DropTarget dt = new DropTarget(this, this);
+		setDropTarget(dt);
+		
 		calculate();
 	}
 
@@ -58,6 +72,7 @@ public class GalleryPanel extends JPanel implements PlayListListener,
 			});
 			revalidate();
 		}
+		System.gc();
 	}
 
 
@@ -449,6 +464,33 @@ public class GalleryPanel extends JPanel implements PlayListListener,
 	@Override
 	public void dragGestureRecognized(DragGestureEvent dge) {
 		
+	}
+
+	@Override
+	public void dragEnter(DropTargetDragEvent dtde) {
+	}
+
+	@Override
+	public void dragOver(DropTargetDragEvent dtde) {
+		if(getComponentCount() == 0){
+			add(separator);
+		}
+		revalidate();
+	}
+
+	@Override
+	public void dropActionChanged(DropTargetDragEvent dtde) {
+	}
+
+	@Override
+	public void dragExit(DropTargetEvent dte) {
+		this.remove(separator);
+		sepAdded = false;
+		revalidate();
+	}
+
+	@Override
+	public void drop(DropTargetDropEvent dtde) {
 	}
 
 	public interface GalleryListener {
