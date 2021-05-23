@@ -19,7 +19,7 @@ public class PreferencesFrame extends javax.swing.JFrame {
 
 	private void loadSettings()
 	{
-		theme = prefs.get(Settings.THEME_KEY, "Dark");
+		theme = prefs.get(Settings.THEME_KEY, "Light");
 		minOnClose = prefs.getBoolean(Settings.CLOSE_KEY, false);
 		showNotification = prefs.getBoolean(Settings.NOTIFICATION_KEY, true);
 		pauseEnbl = prefs.getBoolean(Settings.GLOBAL_ENABLED_KEY, true);

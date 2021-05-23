@@ -23,7 +23,7 @@ public class Settings {
 		prefs.addPreferenceChangeListener((PreferenceChangeEvent evt) -> {
 			loadSettings();
 		});
-		theme = prefs.get(THEME_KEY, "Dark");
+		theme = prefs.get(THEME_KEY, "Light");
 		loadSettings();
 	}
 

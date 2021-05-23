@@ -47,6 +47,7 @@ public class NativeKeyManger implements NativeKeyListener {
 					paused = true;
 				}
 				toPlayPause = false;
+				Application.getFrame().updatePlayIcon();
 			}
 
 			if (nke.getKeyCode() == NativeKeyEvent.VC_LEFT && isPauseDwn
@@ -56,6 +57,7 @@ public class NativeKeyManger implements NativeKeyListener {
 				toPrevious = false;
 				played = false;
 				paused = false;
+				Application.getFrame().updatePlayIcon();
 			}
 			if (nke.getKeyCode() == NativeKeyEvent.VC_RIGHT && isPauseDwn
 					&& toNext)
@@ -64,6 +66,7 @@ public class NativeKeyManger implements NativeKeyListener {
 				toNext = false;
 				played = false;
 				paused = false;
+				Application.getFrame().updatePlayIcon();
 			}
 
 			if (nke.getKeyCode() == NativeKeyEvent.VC_UP && isPauseDwn)
@@ -78,6 +81,7 @@ public class NativeKeyManger implements NativeKeyListener {
 					played = false;
 				}
 				MainFrame.volManager.increaseVol();
+				Application.getFrame().updatePlayIcon();
 			}
 			if (nke.getKeyCode() == NativeKeyEvent.VC_DOWN && isPauseDwn)
 			{
@@ -91,6 +95,7 @@ public class NativeKeyManger implements NativeKeyListener {
 					played = false;
 				}
 				MainFrame.volManager.decreaseVol();
+				Application.getFrame().updatePlayIcon();
 			}
 		}
 	}
